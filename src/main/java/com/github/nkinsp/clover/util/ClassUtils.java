@@ -9,6 +9,8 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Function;
 
+import org.springframework.beans.BeanUtils;
+
 
 /**
  * 
@@ -86,15 +88,12 @@ public class ClassUtils {
 	 * @return
 	 */
 	public static PropertyDescriptor createProperty(Class<?> beanClass,String name) {
-		try {
-			PropertyDescriptor pd = new PropertyDescriptor(name, beanClass);
-			if(pd.getWriteMethod() == null && pd.getReadMethod() == null) {
-				return null;
-			}
-			return pd;
-		} catch (Exception e) {
-			throw new RuntimeException(e);
+	
+		PropertyDescriptor pd = BeanUtils.getPropertyDescriptor(beanClass, name);
+		if(pd.getWriteMethod() == null && pd.getReadMethod() == null) {
+			return null;
 		}
+		return pd;
 	}
 	
 	/**
