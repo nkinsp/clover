@@ -15,7 +15,6 @@ import com.github.nkinsp.clover.cache.CacheManager;
 import com.github.nkinsp.clover.table.EntityFieldInfo;
 import com.github.nkinsp.clover.table.EntityMapper;
 import com.github.nkinsp.clover.util.EntityMapperManager;
-import com.github.nkinsp.clover.util.LockManager;
 
 import net.oschina.j2cache.CacheChannel;
 import net.oschina.j2cache.CacheObject;
@@ -60,6 +59,11 @@ public class J2CacheCacheManager implements CacheManager {
 	
     private CacheChannel cacheChannel  = J2Cache.getChannel();
     
+	private String getKey(Class<?> tableClass) {
+		return "db:"+tableClass.getSimpleName();
+	}
+
+    
     private <K> List<String> getCacheKeys(Collection<K> keys){
     	
        return keys.stream().map(k->String.valueOf(k)).collect(Collectors.toList());
@@ -70,7 +74,7 @@ public class J2CacheCacheManager implements CacheManager {
 	@Override
     public <T, K> T get(Class<T> tableClass, K key) {
     	
-    	CacheObject object = cacheChannel.get(tableClass.getName(), key.toString(), false);
+    	CacheObject object = cacheChannel.get(getKey(tableClass), key.toString(), false);
 		if(object != null) {
 			return (T)object.getValue();
 		}
@@ -81,28 +85,18 @@ public class J2CacheCacheManager implements CacheManager {
 
 	@Override
 	public <T, K> T getAndSet(Class<T> tableClass, K key, Supplier<T> supplier) {
-		
-	
-		try {
-			
-			LockManager.lock(key);
-			
-			T object = get(tableClass, key);
-			
-			if(object != null) {
-				return object;
-			}
-			
-			object = supplier.get();
-			set(tableClass, key, object);
-			
+
+		T object = get(tableClass, key);
+
+		if (object != null) {
 			return object;
-		} finally {
-			
-			LockManager.unLock(key);
-			
 		}
-		
+
+		object = supplier.get();
+		set(tableClass, key, object);
+
+		return object;
+
 	}
 
 
@@ -110,7 +104,7 @@ public class J2CacheCacheManager implements CacheManager {
 	@Override
 	public <T, K> void set(Class<T> tableClass, K key, T value) {
 		
-		cacheChannel.set(tableClass.getName(), String.valueOf(key), value);
+		cacheChannel.set(getKey(tableClass), String.valueOf(key), value);
 		
 	}
 	
@@ -119,7 +113,7 @@ public class J2CacheCacheManager implements CacheManager {
 	@Override
 	public <T, K> List<T> multiGet(Class<T> tableClass, Collection<K> keys) {
 		
-		return cacheChannel.get(tableClass.getName(), getCacheKeys(keys)).values().stream().map(x -> (T) x.getValue())
+		return cacheChannel.get(getKey(tableClass), getCacheKeys(keys)).values().stream().map(x -> (T) x.getValue())
 				.collect(Collectors.toList());
 		
 	}
@@ -133,7 +127,7 @@ public class J2CacheCacheManager implements CacheManager {
 		
 		data.forEach((key,value)->elements.put(String.valueOf(key), value));
 		
-		cacheChannel.set(tableClass.getName(), elements, false);
+		cacheChannel.set(getKey(tableClass), elements, false);
 		
 	}
 	
@@ -182,7 +176,7 @@ public class J2CacheCacheManager implements CacheManager {
 
 	@Override
 	public <T, K> void delete(Class<T> tableClass, K key) {
-		cacheChannel.evict(tableClass.getName(),String.valueOf(key));
+		cacheChannel.evict(getKey(tableClass),String.valueOf(key));
 		
 	}
 
@@ -192,7 +186,7 @@ public class J2CacheCacheManager implements CacheManager {
 		
 		String[] cacheKeys = getCacheKeys(keys).toArray(String[]::new);
 		
-		cacheChannel.evict(tableClass.getName(), cacheKeys);
+		cacheChannel.evict(getKey(tableClass), cacheKeys);
 		
 	}
 	

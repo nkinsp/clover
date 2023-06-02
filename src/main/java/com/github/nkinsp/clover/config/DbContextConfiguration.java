@@ -3,7 +3,8 @@ package com.github.nkinsp.clover.config;
 import java.util.Map;
 import java.util.Set;
 
-
+import org.springframework.beans.factory.FactoryBean;
+import org.springframework.beans.factory.config.BeanDefinition;
 import org.springframework.beans.factory.config.BeanDefinitionHolder;
 import org.springframework.beans.factory.config.ConfigurableBeanFactory;
 import org.springframework.beans.factory.support.AbstractBeanDefinition;
@@ -25,15 +26,17 @@ public class DbContextConfiguration implements ImportBeanDefinitionRegistrar {
 	
 
 	
-
+	public DbContextConfiguration() {
+	}
 	
-
 	@Override
 	public void registerBeanDefinitions(AnnotationMetadata metadata, BeanDefinitionRegistry registry) {
+
 		
 		Map<String, Object> attributes = metadata.getAnnotationAttributes(EnableClover.class.getName());
 		String[] basePackages =  (String[]) attributes.get("basePackages");
 		String dbContextBeanName = (String) attributes.get("dbContextBeanName");
+		
 		if(basePackages == null || basePackages.length == 0) {
 			basePackages = new String[]{ClassUtils.getPackageName(metadata.getClassName())};
 		}
@@ -47,21 +50,20 @@ public class DbContextConfiguration implements ImportBeanDefinitionRegistrar {
 			
 			registry.removeBeanDefinition(beanDefinitionHolder.getBeanName());
 			String beanClassName = beanDefinitionHolder.getBeanDefinition().getBeanClassName();
-
-			Class<?> beanClass = getBeanClass(beanClassName);
+		
 			BeanDefinitionBuilder builder = BeanDefinitionBuilder.genericBeanDefinition(RepositoryFactoryBean.class);
-			
-			builder.addPropertyValue("repositoryInterface", beanClass);
-			builder.addPropertyReference("dbContext", dbContextBeanName);
+			builder.addPropertyValue("repositoryInterfaceClassName", beanClassName);
+			builder.addPropertyValue("dbContextBeanName", dbContextBeanName);
 			builder.setScope(ConfigurableBeanFactory.SCOPE_SINGLETON);
-			builder.setAutowireMode(AbstractBeanDefinition.AUTOWIRE_BY_TYPE);
+			builder.setRole(BeanDefinition.ROLE_INFRASTRUCTURE);
 			
 			AbstractBeanDefinition beanDefinition = builder.getBeanDefinition();
 			
-			beanDefinition.setAttribute("factoryBeanObjectType",beanClassName);
+			beanDefinition.setAttribute(FactoryBean.OBJECT_TYPE_ATTRIBUTE,beanClassName);
 					
 			registry.registerBeanDefinition(beanDefinitionHolder.getBeanName(),beanDefinition);
-	
+			
+			
 			
 			
 		}
@@ -69,15 +71,7 @@ public class DbContextConfiguration implements ImportBeanDefinitionRegistrar {
 		
 	}
 
-	private Class<?> getBeanClass(String beanClassName)  {
-		try {
-			return ClassUtils.forName(beanClassName, ClassUtils.getDefaultClassLoader());
-		} catch (ClassNotFoundException e) {
-			throw new RuntimeException(e);
-		} catch (LinkageError e) {
-			throw new RuntimeException(e);
-		}
-	}
+	
 	
 	
 	

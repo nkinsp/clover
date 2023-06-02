@@ -51,8 +51,6 @@ import lombok.Setter;
 
 /**
  * 
- * @author yue
- *
  */
 public class DbContext extends JdbcTemplate{
 

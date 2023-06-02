@@ -5,7 +5,7 @@ import com.github.nkinsp.clover.table.TableInfo;
 public interface KeyGenerator {
 
 	
-	Object createId(DbContext dbContext,TableInfo tableInfo); 
+	Object createId(DbContext dbContext,TableInfo<?> tableInfo); 
 	
 	
 }

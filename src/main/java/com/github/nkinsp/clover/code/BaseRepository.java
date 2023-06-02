@@ -105,9 +105,9 @@ public interface BaseRepository<Id, En> {
 	 * @param consumer
 	 * @return
 	 */
-	default int deleteBy(Consumer<DeleteWrapper> consumer) {
+	default int deleteBy(Consumer<DeleteWrapper<En>> consumer) {
 
-		DeleteWrapper deleteWrapper = new DeleteWrapper(tableInfo());
+		DeleteWrapper<En> deleteWrapper = new DeleteWrapper<>(tableInfo());
 		consumer.accept(deleteWrapper);
 		return dbContext().executeHandler(new DeleteHandler<>(deleteWrapper));
 	}
