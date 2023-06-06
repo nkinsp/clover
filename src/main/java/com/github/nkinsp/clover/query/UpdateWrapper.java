@@ -44,13 +44,14 @@ public class UpdateWrapper<T> extends AbstractWrapper<UpdateWrapper<T>>{
 		
 		String setStr = updateColumns.keySet().stream().map(k->k+" = "+updateColumns.get(k)).collect(Collectors.joining(","));
 		
-		StringBuilder sqlBuilder = new StringBuilder(SqlKeyword.UPDATE_SQL.format(setStr,tableInfo.getTableName()));
+		StringBuilder sqlBuilder = new StringBuilder(SqlKeyword.UPDATE_SQL.format(tableInfo.getTableName(),setStr));
 		if(!getConditions().isEmpty()) {
-			sqlBuilder.append(SqlKeyword.WHERE.value)
-							.append(" ")
-							.append(getConditions().stream().collect(Collectors.joining(" ")))
-							.append(" ")
-							;
+			sqlBuilder.append(" ")
+					  .append(SqlKeyword.WHERE.value)
+					  .append(" ")
+					  .append(getConditions().stream().collect(Collectors.joining(" ")))
+					  .append(" ")
+					;
 		}
 		return sqlBuilder.toString();
 	}

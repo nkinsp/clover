@@ -192,6 +192,14 @@ public interface BaseRepository<Id, En> {
 		return dbContext().executeHandler(new FindEntityRowMapperHandler<>(queryWrapper.getTableClass(), queryWrapper));
 		
 	}
+	
+	/**
+	 * 获取所有
+	 * @return
+	 */
+	default Rows<En> findRowsAll(){
+		return findRowsBy(s->{});
+	}
 
 	/**
 	 * 条件查询
