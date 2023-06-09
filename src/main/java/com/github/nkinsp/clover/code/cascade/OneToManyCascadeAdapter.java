@@ -19,14 +19,15 @@ import com.github.nkinsp.clover.util.ObjectUtils;
 
 public class OneToManyCascadeAdapter implements CascadeAdapter{
 
-	private DbContext dbContext;
 	
 	@Override
 	public JoinType joinType() {
 		return JoinType.MANY;
 	}
 	
-	private Map<Object, List<?>> getMiddleMapData(CascadeInfo info,Object[] joinFieldValues){
+	private Map<Object, List<?>> getMiddleMapData(DbContext dbContext,CascadeInfo info,Object[] joinFieldValues){
+		
+		
 		
 		//获取
 		BaseRepository<Object, ?> middleRepository = dbContext.createRepository(info.getMiddleTable());
@@ -45,7 +46,7 @@ public class OneToManyCascadeAdapter implements CascadeAdapter{
 
 		//中间表数据
 		Rows<?> middleRows = middleRepository.findRowsBy(s -> s.where().in(joinColumn.getColumnName(), joinFieldValues));
-
+		
 		//中间表外表的列 数据
 		List<Object> inverseValues = middleRows.map(x -> inverseColumn.invokeGet(x)).distinct()
 				.collect(Collectors.toList());
@@ -68,17 +69,17 @@ public class OneToManyCascadeAdapter implements CascadeAdapter{
 
 			List<?> values = (List<?>) value;
 
-			List<?> list = values.stream().map(x -> joinDataMap.get(joinColumn.invokeGet(x))).filter(x -> x != null)
+			List<?> list = values.stream().map(x -> joinDataMap.get(inverseColumn.invokeGet(x))).filter(x -> x != null)
 					.collect(Collectors.toList());
 
 			dataMap.put(key, list);
 
 		});
-
+		
 		return dataMap;
 	}
 	
-	private Map<Object, ?> getJoinDataMap(CascadeInfo info,Object[] joinFieldValues){
+	private Map<Object, ?> getJoinDataMap(DbContext dbContext,CascadeInfo info,Object[] joinFieldValues){
 		
 		
 		BaseRepository<Object, ?> joinRepository = dbContext.createRepository(info.getJoinTable());
@@ -95,9 +96,11 @@ public class OneToManyCascadeAdapter implements CascadeAdapter{
 	}
 
 	@Override
-	public <E,R> void adapter(TableInfo<E> tableInfo,List<R> data, EntityFieldInfo entityFieldInfo) {
+	public <E,R> void adapter(DbContext dbContext,TableInfo<E> tableInfo,List<R> data, EntityFieldInfo entityFieldInfo) {
 	
 	
+		
+		
 		if (CollectionUtils.isEmpty(data)) {
 			return;
 		}
@@ -107,12 +110,19 @@ public class OneToManyCascadeAdapter implements CascadeAdapter{
 		
 		EntityMapper entityMapper = tableInfo.getEntityMapper();
 		
-		EntityFieldInfo joinFieldInfo = entityMapper.get(joinMiddleTable?tableInfo.getPrimaryKeyName():info.getJoinColumn());
+		String joinName = joinMiddleTable?tableInfo.getPrimaryKeyName():info.getJoinColumn();
 		
+		EntityFieldInfo joinFieldInfo = entityMapper.get(joinName);
+		
+		if(joinFieldInfo == null) {
+			throw new RuntimeException("column "+joinName+" not mapping ");
+		}
+		
+	
 		
 		Object[] joinFieldValues = data.stream().map(x->joinFieldInfo.invokeGet(x)).toArray();
 		
-		Map<Object, ?> dataMap = joinMiddleTable?getMiddleMapData(info, joinFieldValues):getJoinDataMap(info, joinFieldValues);
+		Map<Object, ?> dataMap = joinMiddleTable?getMiddleMapData(dbContext,info, joinFieldValues):getJoinDataMap(dbContext,info, joinFieldValues);
 		
 		
 		data.forEach(x->{
@@ -133,5 +143,9 @@ public class OneToManyCascadeAdapter implements CascadeAdapter{
 		
 		
 	}
+
+	
+	
+	
 
 }

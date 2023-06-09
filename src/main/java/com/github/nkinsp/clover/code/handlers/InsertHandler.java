@@ -4,6 +4,7 @@ import java.sql.PreparedStatement;
 import java.sql.Statement;
 import java.util.Collection;
 import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
 
 import org.springframework.jdbc.support.GeneratedKeyHolder;
@@ -37,9 +38,10 @@ public class InsertHandler<R,T> implements ExecuteHandler<R>{
 		
 	
 		EntityMapper mapper = EntityMapperManager.getEntityMapper(entity.getClass());
-		Map<String, Object> entityData = new LinkedHashMap<String, Object>();
+		List<String> columns = mapper.getColumns();
+		Map<String, Object> entityData = new LinkedHashMap<String, Object>(columns.size());
 		
-		for (String column : tableInfo.getColumns()) {
+		for (String column : columns) {
 			EntityFieldInfo fieldInfo = mapper.getByColumnName(column);
 			if(fieldInfo != null) {
 				Object value = fieldInfo.invokeGet(entity);
@@ -48,12 +50,13 @@ public class InsertHandler<R,T> implements ExecuteHandler<R>{
 				}
 			}
 		}	
+		
+		
 	
 		R id = (R) tableInfo.getKeyGenerator().createId(context, tableInfo);
 		if(!StringUtils.isEmpty(id)) {
 			entityData.put(tableInfo.getPrimaryKeyName(),id) ;
 		}
-		
 		
 		InsertWrapper<T> wrapper = new InsertWrapper<T>(tableInfo, entityData);
 		
@@ -78,6 +81,7 @@ public class InsertHandler<R,T> implements ExecuteHandler<R>{
 			Number number = keyHolder.getKey();
 			EntityFieldInfo fieldInfo = mapper.getByColumnName(tableInfo.getPrimaryKeyName());
 			Class<?> idType = fieldInfo.getField().getType();
+			
 			return (R) ConvertUtils.convertTo(number, idType);
 		}
 		context.update(sql, values.toArray());

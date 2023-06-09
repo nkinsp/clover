@@ -75,7 +75,7 @@ public class ObjectUtils {
 	
 	public static <T> T copy(Class<T> type,Object target) {
 		
-		 T bean = BeanUtils.instantiate(type);
+		 T bean = BeanUtils.instantiateClass(type);
 		 BeanUtils.copyProperties(target, bean);
 		 return bean;
 	}

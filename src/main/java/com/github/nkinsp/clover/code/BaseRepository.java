@@ -208,7 +208,7 @@ public interface BaseRepository<Id, En> {
 	 * @param consumer
 	 * @return
 	 */
-	default<R> Rows<R> findRowsBy(Class<R> resultType,Consumer<Condition<QueryWrapper<En>>> consumer) {
+	default<R> Rows<R> findRowsBy(Class<R> resultType,Consumer<QueryWrapper<En>> consumer) {
 		
 		QueryWrapper<En> queryWrapper = new QueryWrapper<En>(tableInfo());
 		consumer.accept(queryWrapper);
@@ -317,7 +317,7 @@ public interface BaseRepository<Id, En> {
 	 * @param consumer
 	 * @return
 	 */
-	default Page<En> findPageBy(Integer pageNum, Integer pageSize, Consumer<Condition<QueryWrapper<En>>> consumer) {
+	default Page<En> findPageBy(Integer pageNum, Integer pageSize, Consumer<QueryWrapper<En>> consumer) {
 
 		TableInfo<En> tableInfo = tableInfo();
 		return findPageBy(pageNum, pageSize, tableInfo.getEntityClass(), consumer);
@@ -334,7 +334,7 @@ public interface BaseRepository<Id, En> {
 	 * @return
 	 */
 	default <R> Page<R> findPageBy(Integer pageNum, Integer pageSize, Class<R> resultType,
-			Consumer<Condition<QueryWrapper<En>>> consumer) {
+			Consumer<QueryWrapper<En>> consumer) {
 		PagingQueryWrapper<En> wrapper = new PagingQueryWrapper<>(tableInfo(), dbContext().getDbType(), pageNum,
 				pageSize);
 		consumer.accept(wrapper);
@@ -367,7 +367,7 @@ public interface BaseRepository<Id, En> {
 	 * @param consumer
 	 * @return
 	 */
-	default Long findCountBy(Consumer<Condition<QueryWrapper<En>>> consumer) {
+	default Long findCountBy(Consumer<QueryWrapper<En>> consumer) {
 		QueryWrapper<En> wrapper = new QueryWrapper<>(tableInfo());
 		wrapper.select(SqlKeyword.COUNT.format("1"));
 		consumer.accept(wrapper);

@@ -25,6 +25,7 @@ public class PagingQueryWrapper<T> extends QueryWrapper<T>{
 		super(tableInfo);
 		this.pageNumber = pageNumber;
 		this.pageSize = pageSize;
+		this.dbType = dbType;
 	}
 	
 	

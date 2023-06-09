@@ -55,7 +55,7 @@ public class SpringDataRedisCacheManger implements CacheManager {
 	@Override
 	public <T, K> List<T> multiGet(Class<T> tableClass, Collection<K> keys) {
 
-		return (List<T>) redisTemplate.opsForHash().multiGet(getKey(tableClass), (Collection<Object>) keys);
+		return (List<T>) redisTemplate.opsForHash().multiGet(getKey(tableClass), (Collection<Object>) keys).stream().filter(v->v!= null).collect(Collectors.toList());
 
 	}
 
@@ -97,13 +97,16 @@ public class SpringDataRedisCacheManger implements CacheManager {
 	public <T, K> List<T> multiGetAndSet(Class<T> tableClass, Collection<K> keys, String keyName,
 			Function<Collection<K>, List<T>> func) {
 
+		
 		List<T> values = multiGet(tableClass, keys);
+		
+
 
 		EntityMapper mapper = EntityMapperManager.getEntityMapper(tableClass);
 
 		EntityFieldInfo fieldInfo = mapper.getByFieldName(keyName);
 
-		Set<K> cacheKeys = values.stream().map(x -> (K) fieldInfo.invokeGet(x)).collect(Collectors.toSet());
+		Set<K> cacheKeys = values.stream().filter(x-> x!= null).map(x -> (K) fieldInfo.invokeGet(x)).collect(Collectors.toSet());
 
 		List<K> noCacheKeys = keys.stream().filter(k -> !cacheKeys.contains(k)).collect(Collectors.toList());
 

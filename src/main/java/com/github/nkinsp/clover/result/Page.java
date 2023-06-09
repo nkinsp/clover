@@ -11,7 +11,7 @@ public class Page<T> {
 
 	private long count;
 	
-	private List<T>  data;
+	private List<T>  list;
 
 	public long getCount() {
 		return count;
@@ -21,18 +21,18 @@ public class Page<T> {
 		this.count = count;
 	}
 
-	public List<T> getData() {
-		return data;
+	public List<T> getList() {
+		return list;
 	}
 
-	public void setData(List<T> data) {
-		this.data = data;
+	public void setList(List<T> data) {
+		this.list = data;
 	}
 
-	public Page(long count, List<T> data) {
+	public Page(long count, List<T> list) {
 		super();
 		this.count = count;
-		this.data = data;
+		this.list = list;
 	}
 
 	public Page() {

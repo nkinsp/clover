@@ -59,6 +59,7 @@ public class FindEntityRowMapperHandler<E, T> implements ExecuteHandler<Rows<E>>
 		if(entitySelectMapper != null) {
 			EntityMapper mapper = EntityMapperManager.getEntityMapper(entityClass);
 			List<EntityFieldInfo> entityFieldInfos = mapper.getEntityFieldInfos();
+			
 			for (EntityFieldInfo entityFieldInfo : entityFieldInfos) {
 				SelectMapperColumn column = entityFieldInfo.getField().getAnnotation(SelectMapperColumn.class);
 				if(column != null) {
@@ -80,14 +81,14 @@ public class FindEntityRowMapperHandler<E, T> implements ExecuteHandler<Rows<E>>
 	
 		EntityCascadeMapper mapper = entityClass.getAnnotation(EntityCascadeMapper.class);
 		if (mapper != null) {
-
+			EntityMapper entityMapper = EntityMapperManager.getEntityMapper(entityClass);
 			Map<JoinType, CascadeAdapter> cascadeAdapters = DbContext.getCascadeAdapters();
-			tableInfo.getEntityMapper().getEntityFieldInfos().stream().filter(EntityFieldInfo::isCascade)
+			entityMapper.getEntityFieldInfos().stream().filter(EntityFieldInfo::isCascade)
 					.forEach(entityFieldInfo -> {
 						CascadeInfo cascadeInfo = entityFieldInfo.getCascadeInfo();
 						CascadeAdapter adapter = cascadeAdapters.get(cascadeInfo.getJoinType());
 						if (adapter != null) {
-							adapter.adapter(tableInfo, results, entityFieldInfo);
+							adapter.adapter(context,tableInfo, results, entityFieldInfo);
 						}
 					});
 

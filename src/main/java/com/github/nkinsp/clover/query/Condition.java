@@ -7,11 +7,6 @@ import java.util.function.Consumer;
 public interface Condition<S extends Condition<S>> {
 
 	
-	@SuppressWarnings("unchecked")
-	default S self() {
-		return (S) this;
-	}
-	
 	/**
 	 *  sql 片段
 	 * @param sql

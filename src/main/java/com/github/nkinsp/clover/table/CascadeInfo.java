@@ -19,8 +19,6 @@ public class CascadeInfo {
 	
 	private Class<?> middleTable;
 	
-	private String joinMiddleTableColumn;
-	
 	private Class<?> resultTypeClass;
 	
 }

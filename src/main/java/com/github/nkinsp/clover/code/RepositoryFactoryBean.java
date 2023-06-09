@@ -44,6 +44,8 @@ public class RepositoryFactoryBean implements FactoryBean<Object>,InvocationHand
 	
 	private TableInfo<?> tableInfo;
 	
+	private Class<?> tableClass;
+	
 	private ApplicationContext applicationContext;
 	
 	private static ConcurrentHashMap<Integer, MethodHandle> methodHandleMap = new ConcurrentHashMap<Integer, MethodHandle>();
@@ -75,6 +77,18 @@ public class RepositoryFactoryBean implements FactoryBean<Object>,InvocationHand
 		return dbContext;
 	}
 	
+	private TableInfo<?> getTableInfo(){
+		
+		if(tableInfo != null) {
+			return tableInfo;
+		}
+		
+		this.tableInfo = DbContext.getTableInfo(tableClass);
+		
+		return tableInfo;
+		
+	}
+	
 
 
 	public void setRepositoryInterface(Class<?> repositoryInterface) {
@@ -91,8 +105,7 @@ public class RepositoryFactoryBean implements FactoryBean<Object>,InvocationHand
 		if(!optional.isPresent()) {
 			throw new RuntimeException("no table entity mappping");
 		}
-		Class<?> tableClass = (Class<?>) optional.get();
-		this.tableInfo = DbContext.getTableInfo(tableClass);
+		this.tableClass = (Class<?>) optional.get();
 	}
 	
 	private void  addCondition(AbstractWrapper<?> wrapper,Method method,Object[] args){
@@ -141,7 +154,7 @@ public class RepositoryFactoryBean implements FactoryBean<Object>,InvocationHand
 			return getDbContext();
 		}
 		if ("tableInfo".equals(methodName)) {
-			return this.tableInfo;
+			return getTableInfo();
 		}
 		Class<?> returnType = method.getReturnType();
 		if (methodName.startsWith("findBy")) {
@@ -153,6 +166,14 @@ public class RepositoryFactoryBean implements FactoryBean<Object>,InvocationHand
 				return getDbContext().executeHandler(new FindEntityRowMapperHandler<>(entityClass, wrapper));
 			}
 			return getDbContext().executeHandler(new FindByQueryHandler<>(returnType, wrapper));
+		}
+		
+		if(methodName.startsWith("findCountBy")) {
+			QueryWrapper<?> wrapper = buildMethodParamQueryWrapper(method, args);
+			wrapper.select("COUNT(1)");
+			return getDbContext().executeHandler(new FindByQueryHandler<>(returnType, wrapper));
+			
+			
 		}
 		if (methodName.startsWith("deleteBy")) {
 			 return getDbContext().executeHandler(new DeleteHandler<>(buildMethodParamDeleteWrapper(method, args)));

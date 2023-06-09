@@ -24,7 +24,9 @@ import java.util.Date;
 import java.util.Iterator;
 import java.util.Map;
 
+import org.springframework.beans.BeanInstantiationException;
 import org.springframework.beans.BeanUtils;
+import org.springframework.beans.BeansException;
 
 /**
  */
@@ -446,144 +448,149 @@ public class ConvertUtils{
     }
 
 
-    @SuppressWarnings({"unchecked"})
-    public static <T> T convertTo(Object obj, Class<T> classType){
-        if(obj == null){
-            if(classType == int.class){
-                return (T) Integer.valueOf(0);
-            } else if(classType == long.class){
-                return (T) Long.valueOf(0);
-            } else if(classType == short.class){
-                return (T) Short.valueOf((short) 0);
-            } else if(classType == byte.class){
-                return (T) Byte.valueOf((byte) 0);
-            } else if(classType == float.class){
-                return (T) Float.valueOf(0);
-            } else if(classType == double.class){
-                return (T) Double.valueOf(0);
-            } else if(classType == boolean.class){
-                return (T) Boolean.FALSE;
-            }
-            return null;
-        }
+	@SuppressWarnings({ "unchecked" })
+	public static <T> T convertTo(Object obj, Class<T> classType) {
 
-        if(classType == null){
-            throw new IllegalArgumentException("clazz is null");
-        }
+		try {
+			if (obj == null) {
+				if (classType == int.class) {
+					return (T) Integer.valueOf(0);
+				} else if (classType == long.class) {
+					return (T) Long.valueOf(0);
+				} else if (classType == short.class) {
+					return (T) Short.valueOf((short) 0);
+				} else if (classType == byte.class) {
+					return (T) Byte.valueOf((byte) 0);
+				} else if (classType == float.class) {
+					return (T) Float.valueOf(0);
+				} else if (classType == double.class) {
+					return (T) Double.valueOf(0);
+				} else if (classType == boolean.class) {
+					return (T) Boolean.FALSE;
+				}
+				return null;
+			}
 
-        if(classType == obj.getClass()){
-            return (T) obj;
-        }
+			if (classType == null) {
+				throw new IllegalArgumentException("clazz is null");
+			}
 
-        if(obj instanceof Map){
-            if(classType == Map.class){
-                return (T) obj;
-            }
-        }
+			if (classType == obj.getClass()) {
+				return (T) obj;
+			}
 
-        if(obj instanceof Number) {
-        	
-        	
-        	if(classType == int.class || classType == Integer.class) {
-        		return (T) new Integer( ((Number) obj).intValue());
-        	}
-        	
-        	if(classType == long.class || classType == Long.class) {
-        		return (T) new Long( ((Number) obj).longValue());
-        	}
-        }
+			if (obj instanceof Map) {
+				if (classType == Map.class) {
+					return (T) obj;
+				}
+			}
 
-        if(classType.isAssignableFrom(obj.getClass())){
-            return (T) obj;
-        }
+			if (obj instanceof Number) {
 
-        if(classType == boolean.class || classType == Boolean.class){
-            return (T) convertToBoolean(obj);
-        }
+				if (classType == int.class || classType == Integer.class) {
 
-        if(classType == byte.class || classType == Byte.class){
-            return (T) convertToByte(obj);
-        }
+					return (T) Integer.valueOf(((Number) obj).intValue());
 
-        if(classType == char.class || classType == Character.class){
-            return (T) convertToChar(obj);
-        }
+				}
 
-        if(classType == short.class || classType == Short.class){
-            return (T) convertToShort(obj);
-        }
+				if (classType == long.class || classType == Long.class) {
+					return (T) Long.valueOf(((Number) obj).longValue());
+				}
+				if (classType == BigInteger.class) {
+					return (T) BigInteger.valueOf(((Number) obj).longValue());
+				}
+			}
 
-        if(classType == int.class || classType == Integer.class){
-            return (T) convertToInt(obj);
-        }
+			if (classType.isAssignableFrom(obj.getClass())) {
+				return (T) obj;
+			}
 
-        if(classType == long.class || classType == Long.class){
-            return (T) convertToLong(obj);
-        }
+			if (classType == boolean.class || classType == Boolean.class) {
+				return (T) convertToBoolean(obj);
+			}
 
-        if(classType == float.class || classType == Float.class){
-            return (T) convertToFloat(obj);
-        }
+			if (classType == byte.class || classType == Byte.class) {
+				return (T) convertToByte(obj);
+			}
 
-        if(classType == double.class || classType == Double.class){
-            return (T) convertToDouble(obj);
-        }
+			if (classType == char.class || classType == Character.class) {
+				return (T) convertToChar(obj);
+			}
 
-        if(classType == String.class){
-            return (T) convertToString(obj);
-        }
+			if (classType == short.class || classType == Short.class) {
+				return (T) convertToShort(obj);
+			}
 
-        if(classType == BigDecimal.class){
-            return (T) convertToBigDecimal(obj);
-        }
+			if (classType == int.class || classType == Integer.class) {
+				return (T) convertToInt(obj);
+			}
 
-        if(classType == BigInteger.class){
-            return (T) convertToBigInteger(obj);
-        }
+			if (classType == long.class || classType == Long.class) {
+				return (T) convertToLong(obj);
+			}
 
-        if(classType == Date.class){
-            return (T) convertToDate(obj);
-        }
+			if (classType == float.class || classType == Float.class) {
+				return (T) convertToFloat(obj);
+			}
 
-        if(classType == java.sql.Date.class){
-            return (T) convertToSqlDate(obj);
-        }
+			if (classType == double.class || classType == Double.class) {
+				return (T) convertToDouble(obj);
+			}
 
-        if(classType == java.sql.Time.class){
-            return (T) convertToSqlTime(obj);
-        }
+			if (classType == String.class) {
+				return (T) convertToString(obj);
+			}
 
-        if(classType == java.sql.Timestamp.class){
-            return (T) convertToTimestamp(obj);
-        }
+			if (classType == BigDecimal.class) {
+				return (T) convertToBigDecimal(obj);
+			}
 
+			if (classType == BigInteger.class) {
+				return (T) convertToBigInteger(obj);
+			}
 
-        if(obj instanceof String){
-            String strVal = (String) obj;
-            if(strVal.length() == 0 //
-                    || "null".equals(strVal) //
-                    || "NULL".equals(strVal)){
-                return null;
-            }
+			if (classType == Date.class) {
+				return (T) convertToDate(obj);
+			}
 
-            if(classType == java.util.Currency.class){
-                return (T) java.util.Currency.getInstance(strVal);
-            }
+			if (classType == java.sql.Date.class) {
+				return (T) convertToSqlDate(obj);
+			}
 
-        }
-        
-        
-       if(!ObjectUtils.isEmpty(obj)) {
-    	   T newObj = BeanUtils.instantiateClass(classType);
-    	    BeanUtils.copyProperties(obj,  newObj);
-    	    return newObj;
-       }
-        
-     
-        
-        
-        throw new RuntimeException("can not cast to : " + classType.getName());
-    }
+			if (classType == java.sql.Time.class) {
+				return (T) convertToSqlTime(obj);
+			}
+
+			if (classType == java.sql.Timestamp.class) {
+				return (T) convertToTimestamp(obj);
+			}
+
+			if (obj instanceof String) {
+				String strVal = (String) obj;
+				if (strVal.length() == 0 //
+						|| "null".equals(strVal) //
+						|| "NULL".equals(strVal)) {
+					return null;
+				}
+
+				if (classType == java.util.Currency.class) {
+					return (T) java.util.Currency.getInstance(strVal);
+				}
+
+			}
+
+			if (!ObjectUtils.isEmpty(obj)) {
+				T newObj = BeanUtils.instantiateClass(classType);
+				BeanUtils.copyProperties(obj, newObj);
+				return newObj;
+			}
+		}  catch (Exception e) {
+			throw new RuntimeException("can not cast to : " + classType.getName());
+		}
+
+		return (T) obj;
+		
+	}
 
 
 

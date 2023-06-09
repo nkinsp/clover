@@ -101,12 +101,12 @@ public class QueryWrapper<En> extends AbstractWrapper<QueryWrapper<En>>{
 							;
 		}
 		if(!ObjectUtils.isEmpty(groupBy)) {
-			sqlBuilder.append(SqlKeyword.GROUP_BY.format(this.groupBy))
+			sqlBuilder.append(groupBy)
 							.append(" ")
 							;
 		}
 		if(!ObjectUtils.isEmpty(orderBy)) {
-			sqlBuilder.append(SqlKeyword.ORDER_BY.format(this.orderBy))
+			sqlBuilder.append(orderBy)
 							 .append(" ")
 							 ;
 		}

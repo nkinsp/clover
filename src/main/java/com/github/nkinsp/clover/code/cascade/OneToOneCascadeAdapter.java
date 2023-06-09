@@ -18,7 +18,6 @@ import com.github.nkinsp.clover.util.ObjectUtils;
 
 public class OneToOneCascadeAdapter implements CascadeAdapter{
 
-	private DbContext dbContext;
 	
 	@Override
 	public JoinType joinType() {
@@ -27,7 +26,7 @@ public class OneToOneCascadeAdapter implements CascadeAdapter{
 	}
 
 	@Override
-	public <E,R> void adapter(TableInfo<E> tableInfo,List<R> data, EntityFieldInfo entityFieldInfo) {
+	public <E,R> void adapter(DbContext dbContext,TableInfo<E> tableInfo,List<R> data, EntityFieldInfo entityFieldInfo) {
 	
 	
 		if (CollectionUtils.isEmpty(data)) {
@@ -39,8 +38,7 @@ public class OneToOneCascadeAdapter implements CascadeAdapter{
 		
 		EntityFieldInfo joinColumnField = mapper.get(info.getJoinColumn());
 		
-		
-		List<Object> joinFieldValues = data.stream().map(x->joinColumnField.invokeGet(x)).collect(Collectors.toList());
+		List<Object> joinFieldValues = data.stream().map(x->joinColumnField.invokeGet(x)).distinct().collect(Collectors.toList());
 		
 		
 		Class<?> joinTable = info.getJoinTable();
@@ -49,8 +47,11 @@ public class OneToOneCascadeAdapter implements CascadeAdapter{
 		BaseRepository<Object, ?> repository = dbContext.createRepository(joinTable);
 		
 		TableInfo<?> joinTableInfo = repository.tableInfo();
+
 		
 		Rows<?> rows = repository.findByIds(joinFieldValues);
+		
+	
 				
 		EntityMapper entityMapper = joinTableInfo.getEntityMapper();
 		

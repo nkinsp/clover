@@ -20,6 +20,7 @@ import org.springframework.jdbc.core.JdbcTemplate;
 
 import com.github.nkinsp.clover.cache.CacheManager;
 import com.github.nkinsp.clover.code.cascade.CascadeAdapter;
+import com.github.nkinsp.clover.code.cascade.OneToManyCascadeAdapter;
 import com.github.nkinsp.clover.code.cascade.OneToOneCascadeAdapter;
 import com.github.nkinsp.clover.code.dialect.MysqlDbDialectAdapter;
 import com.github.nkinsp.clover.code.handlers.ExecuteHandler;
@@ -93,6 +94,8 @@ public class DbContext extends JdbcTemplate{
 	public DbContext(DataSource dataSource) {
 		super(dataSource);
 		this.dbType = this.initDbType();
+		
+		
 	}
 	
 	
@@ -130,7 +133,7 @@ public class DbContext extends JdbcTemplate{
 		return new BaseRepository<Id, En>() {
 
 			@Override
-			public DbContext dbContext() {
+			public DbContext dbContext() {				
 				return DbContext.this;
 			}
 
@@ -164,10 +167,6 @@ public class DbContext extends JdbcTemplate{
 			
 			
 		}
-		
-		
-		
-		
 		
 		return null;
 	}
@@ -217,6 +216,7 @@ public class DbContext extends JdbcTemplate{
 	
 	
 	public static DbDialectAdapter getDialectAdapter(DbType dbType) {
+		
 		
 		DbDialectAdapter adapter = dialectAdapters.get(dbType);
 		
@@ -281,6 +281,7 @@ public class DbContext extends JdbcTemplate{
 	
 	private static void initCascadeAdapter() {
 		addCascadeAdapter(new OneToOneCascadeAdapter());
+		addCascadeAdapter(new OneToManyCascadeAdapter());
 	}
 
 	public static void addConditionAdapter(ConditionAdapter<? extends Annotation> adapter) {

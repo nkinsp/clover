@@ -2,8 +2,11 @@ package com.github.nkinsp.clover.code.handlers;
 
 
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+
+import org.springframework.util.CollectionUtils;
 
 import com.github.nkinsp.clover.cache.CacheManager;
 import com.github.nkinsp.clover.code.DbContext;
@@ -50,6 +53,12 @@ public class FindByIdsHandler<T,Id>  implements ExecuteHandler<Rows<T>> {
 
 	@Override
 	public Rows<T> handle(DbContext context) {
+		
+		
+		if(CollectionUtils.isEmpty(ids)) {
+			return Rows.of(new ArrayList<>());
+		}
+		
 		
 		if(tableInfo.isCache()) {
 			

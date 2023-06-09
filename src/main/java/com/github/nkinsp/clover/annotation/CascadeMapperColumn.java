@@ -19,7 +19,7 @@ public @interface CascadeMapperColumn {
 	 * 当前对象字段
 	 * @return
 	 */
-	String field() default "";
+	String joinColumn() default "";
 	
 	/**
 	 * 联合类型
@@ -43,7 +43,7 @@ public @interface CascadeMapperColumn {
 	 * 联合表的字段
 	 * @return
 	 */
-	String joinField() default "";
+	String inverseColumn() default "";
 	
 	
 	

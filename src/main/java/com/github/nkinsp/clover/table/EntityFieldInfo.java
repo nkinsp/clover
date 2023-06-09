@@ -51,25 +51,30 @@ public class EntityFieldInfo {
 			if (cascade != null) {
 				info.setCascade(true);
 				CascadeInfo deinfo = new CascadeInfo();
-				deinfo.setJoinTable(cascade.joinTable() == void.class ? field.getType() : cascade.joinTable());
 				deinfo.setJoinType(cascade.joinType());
-				deinfo.setJoinColumn(StringUtils.isEmpty(cascade.joinField()) ? field.getName() : cascade.joinField());
+				deinfo.setJoinColumn(StringUtils.isEmpty(cascade.joinColumn()) ? field.getName()+"_id" : cascade.joinColumn());
 				deinfo.setResultTypeClass(field.getType());
 				if (deinfo.getJoinType() == JoinType.MANY) {
 					if (!List.class.isAssignableFrom(field.getType())) {
 						throw new RuntimeException("field " + field.getName() + " must be AssignableFrom List");
 					}
 					ParameterizedType type = (ParameterizedType) field.getGenericType();
+			
 					Class<?> typeClass = (Class<?>) type.getActualTypeArguments()[0];
+					
+					deinfo.setJoinTable(cascade.joinTable() == void.class ? typeClass:cascade.joinTable());
+					
 					deinfo.setResultTypeClass(typeClass);
+				}else {
+					deinfo.setJoinTable(cascade.joinTable() == void.class ? field.getType():cascade.joinTable());
 				}
 				deinfo.setMiddleTable(cascade.joinMiddleTable());
-				deinfo.setInverseColumn(StringUtils.isEmpty(cascade.joinField())
+				deinfo.setInverseColumn(StringUtils.isEmpty(cascade.inverseColumn())
 						? StringUtils.camelToUnder(deinfo.getJoinTable().getSimpleName()) + "_id"
-						: cascade.joinField());
+						: cascade.inverseColumn());
 				info.setCascadeInfo(deinfo);
 			}
-			info.setProperty(BeanUtils.getPropertyDescriptor(beanClass, field.getName()));
+			info.setProperty(BeanUtils.getPropertyDescriptor(beanClass, field.getName()));			
 			return info;
 		}
 
