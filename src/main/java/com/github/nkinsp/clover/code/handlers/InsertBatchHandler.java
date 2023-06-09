@@ -6,14 +6,13 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.springframework.jdbc.core.simple.SimpleJdbcInsert;
 import org.springframework.util.CollectionUtils;
 
 import com.github.nkinsp.clover.code.DbContext;
+import com.github.nkinsp.clover.query.InsertWrapper;
 import com.github.nkinsp.clover.table.EntityFieldInfo;
 import com.github.nkinsp.clover.table.EntityMapper;
 import com.github.nkinsp.clover.table.TableInfo;
-import com.github.nkinsp.clover.util.EntityMapperManager;
 
 import lombok.extern.slf4j.Slf4j;
 
@@ -24,7 +23,6 @@ public class InsertBatchHandler<En> implements ExecuteHandler<int[]>{
 	
 	private TableInfo<En> tableInfo;
 	
-	@SuppressWarnings("unchecked")
 	@Override
 	public int[] handle(DbContext context) {
 
@@ -32,7 +30,7 @@ public class InsertBatchHandler<En> implements ExecuteHandler<int[]>{
 			return new int[0];
 		}
 
-		EntityMapper mapper = EntityMapperManager.getEntityMapper(tableInfo.getEntityClass());
+		EntityMapper mapper = tableInfo.getEntityMapper();
 
 		int size = entitys.size();
 
@@ -45,6 +43,10 @@ public class InsertBatchHandler<En> implements ExecuteHandler<int[]>{
 				EntityFieldInfo fieldInfo = mapper.getByColumnName(column);
 				if (fieldInfo != null) {
 					Object value = fieldInfo.invokeGet(entity);
+					//主键
+					if(value == null && fieldInfo.getColumnName().equals(tableInfo.getPrimaryKeyName())) {
+						value = tableInfo.getKeyGenerator().createId(context, tableInfo);
+					}
 					if (value != null) {
 						entityData.put(column, value);
 					}
@@ -54,15 +56,19 @@ public class InsertBatchHandler<En> implements ExecuteHandler<int[]>{
 		}
 		
 		Map<String, Object> first = batchData.get(0);
-
-		SimpleJdbcInsert insert = new SimpleJdbcInsert(context)
-				.withTableName(tableInfo.getTableName())
-				.usingColumns(first.keySet().toArray(String[]::new));
+		
+		InsertWrapper<En> wrapper = new InsertWrapper<>(tableInfo, first);
+		
+		String sql = wrapper.buildSql();
+		
+		List<Object[]> values = batchData.stream().map(data->data.values().toArray()).toList();
+		
 		if(context.isSqlLog()) {
-			log.info("===> execute batch [sql={}  size={}]", insert.getInsertString(),batchData.size());
+			log.info("===> execute batch [sql={}  size={}]",sql,batchData.size());
 		}
 		
-		return insert.executeBatch(batchData.toArray(LinkedHashMap[]::new));
+		return context.batchUpdate(sql, values);
+		
 
 	}
 

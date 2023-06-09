@@ -2,8 +2,10 @@ package com.github.nkinsp.clover.table;
 
 
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 
 import com.github.nkinsp.clover.annotation.Table;
+import com.github.nkinsp.clover.cache.CacheKeyGenerator;
 import com.github.nkinsp.clover.code.KeyGenerator;
 import com.github.nkinsp.clover.enums.PrimaryKeyType;
 import com.github.nkinsp.clover.util.ClassUtils;
@@ -46,6 +48,16 @@ public class TableInfo<T> {
 	private boolean cache;
 	
 	/**
+	 * 缓存时间单位
+	 */
+	private TimeUnit cacheTimeUnit;
+	
+	/**
+	 * 缓存时间
+	 */
+	private long cacheTime;
+	
+	/**
 	 * 是否逻辑删除
 	 */
 	private boolean logicDelete;
@@ -70,6 +82,11 @@ public class TableInfo<T> {
 	 * 主键生成器
 	 */
 	private KeyGenerator keyGenerator;
+	
+	/**
+	 * 缓存key生成
+	 */
+	private CacheKeyGenerator cacheKeyGenerator;
 
 
 	public TableInfo(Class<T> entityClass) {
@@ -87,6 +104,8 @@ public class TableInfo<T> {
 		String tableName = StringUtils.isEmpty(table.name())?StringUtils.camelToUnder(this.entityClass.getSimpleName()):table.name();
 		setTableName(tableName);
 		setCache(table.cache());
+		setCacheTime(table.cacheTime());
+		setCacheTimeUnit(table.cacheTimeUnit());
 		setPrimaryKeyName(table.primaryKeyName());
 		setEntityMapper(EntityMapperManager.getEntityMapper(entityClass));
 		setLogicDelete(table.logicDelete());
@@ -94,6 +113,8 @@ public class TableInfo<T> {
 		setColumns(this.entityMapper.getColumns());
 		setPrimaryKeyType(table.primaryKeyType());
 		setKeyGenerator((KeyGenerator) ClassUtils.newInstance(table.primaryKeyGenerator()));
+		setCacheKeyGenerator((CacheKeyGenerator) ClassUtils.newInstance(table.cacheKeyGenerator()));
+		
 		
 	}
 	

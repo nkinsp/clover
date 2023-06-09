@@ -27,8 +27,7 @@ public class FindByIdHandler<T> extends FindByQueryHandler<T, T>{
 		if (tableInfo.isCache()) {
 			CacheManager manager = context.getCacheManager();
 			if (manager != null) {
-				 Class<T> entityClass = tableInfo.getEntityClass();
-				return  manager.getAndSet(entityClass, id,()->super.handle(context));
+				return  manager.getAndSet(tableInfo, id,()->super.handle(context));
 			}
 		}
 		

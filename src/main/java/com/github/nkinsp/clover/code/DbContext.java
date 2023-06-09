@@ -148,7 +148,7 @@ public class DbContext extends JdbcTemplate{
 	
 	
 
-	protected Object primaryKeyGenerator(TableInfo<?> tableInfo) {
+	public Object primaryKeyGenerator(TableInfo<?> tableInfo) {
 		
 		if(tableInfo.getPrimaryKeyType() == PrimaryKeyType.AUTO_INCREMENT) {
 			return null;
@@ -162,9 +162,8 @@ public class DbContext extends JdbcTemplate{
 			
 			if(keyGenerator == null) {
 				
-				
+				return keyGenerator.createId(this, tableInfo);
 			}
-			
 			
 		}
 		

@@ -42,7 +42,7 @@ public class UpdateEntityHandler<T> extends UpdateHandler<T>{
 			if(tableInfo.isCache()) {
 				CacheManager manager = context.getCacheManager();
 				if(manager != null) {
-					manager.delete(tableInfo.getEntityClass(), id);
+					manager.delete(tableInfo, id);
 				}
 			}
 		}

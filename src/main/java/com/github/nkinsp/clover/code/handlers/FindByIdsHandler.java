@@ -21,7 +21,7 @@ import com.github.nkinsp.clover.table.TableInfo;
 public class FindByIdsHandler<T,Id>  implements ExecuteHandler<Rows<T>> {
 
 	   
-   private Collection<Id> ids;
+   private Collection<Object> ids;
 
 
    private TableInfo<T> tableInfo;
@@ -40,11 +40,12 @@ public class FindByIdsHandler<T,Id>  implements ExecuteHandler<Rows<T>> {
 
 
 
+	@SuppressWarnings("unchecked")
 	public FindByIdsHandler(TableInfo<T> tableInfo, Collection<Id> ids) {
 		
 		
 		this.tableInfo = tableInfo;
-		this.ids = ids;
+		this.ids = (Collection<Object>) ids;
 		
 		
 	}
@@ -64,21 +65,14 @@ public class FindByIdsHandler<T,Id>  implements ExecuteHandler<Rows<T>> {
 			
 			CacheManager manager = context.getCacheManager();
 			if(manager != null) {
-				Class<T> entityClass = tableInfo.getEntityClass();
-				List<T> list = manager.multiGetAndSet(
-						entityClass,
-						ids, 
-						tableInfo.getPrimaryKeyName(),
-						nowCacheKeys->findRowsByIds(context, nowCacheKeys.toArray())
-				);
+				List<T> list = manager.multiGetAndSet(tableInfo, ids, keys->findRowsByIds(context, keys.toArray()));
 				return Rows.of(list);
-				
 			}
 			
 			
 		}
 		
-		return Rows.of( findRowsByIds(context, this.ids.toArray()));
+		return Rows.of(findRowsByIds(context, this.ids.toArray()));
 	}
 
 

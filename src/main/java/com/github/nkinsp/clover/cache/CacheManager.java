@@ -6,25 +6,92 @@ import java.util.Map;
 import java.util.function.Function;
 import java.util.function.Supplier;
 
+import com.github.nkinsp.clover.table.TableInfo;
+
+/**
+ * 缓存管理
+ * @author yue
+ *
+ */
 public interface CacheManager {
 
-	<T,K> T get(Class<T> tableClass,K key);
+	/**
+	 * 获取缓存
+	 * @param <T>
+	 * @param tableInfo
+	 * @param key
+	 * @return
+	 */
+	<T> T get(TableInfo<T> tableInfo,Object key);
 	
-	<T,K>T getAndSet(Class<T> tableClass,K key,Supplier<T> supplier);
+
+	/**
+	 * 
+	 * @param <T>
+	 * @param tableInfo
+	 * @param key
+	 * @param supplier
+	 * @return
+	 */
+	<T> T getAndSet(TableInfo<T> tableInfo,Object key,Supplier<T> supplier);
 	
-    <T,K> void set(Class<T> tableClass, K key,T value);
+	/**
+	 * @param <T>
+	 * @param tableInfo
+	 * @param key
+	 * @param value
+	 */
+    <T> void set(TableInfo<T> tableInfo, Object key,T value);
 	
-	<T,K> List<T> multiGet(Class<T> tableClass, Collection<K> keys);
+    /**
+     * 
+     * @param <T>
+     * @param tableInfo
+     * @param keys
+     * @return
+     */
+	<T> List<T> multiGet(TableInfo<T> tableInfo, Collection<Object> keys);
 	
-	<T,K> void multiSet(Class<T> tableClass,Map<K, T> data);
+	/**
+	 * 
+	 * @param <T>
+	 * @param tableInfo
+	 * @param data
+	 */
+	<T> void multiSet(TableInfo<T> tableInfo,Map<Object, T> data);
 	
-	<T,K> void multiSet(Class<T> tableClass,String keyName,List<T> values);
+	/**
+	 * @param <T>
+	 * @param tableInfo
+	 * @param values
+	 */
+	<T> void multiSet(TableInfo<T> tableInfo,List<T> values);
 	
-	<T,K> List<T> multiGetAndSet(Class<T> tableClass,Collection<K> keys,String keyName,Function<Collection<K>,List<T>> func);
+	/**
+	 * 批量获取
+	 * @param <T>
+	 * @param tableInfo
+	 * @param keys
+	 * @param func
+	 * @return
+	 */
+	<T> List<T> multiGetAndSet(TableInfo<T> tableInfo,Collection<Object> keys,Function<Collection<Object>,List<T>> func);
 	
-	<T,K> void delete(Class<T> tableClass, K key);
+	/**
+	 * 删除
+	 * @param <T>
+	 * @param tableInfo
+	 * @param key
+	 */
+	<T> void delete(TableInfo<T> tableInfo, Object key);
 	
-	<T,K> void delete(Class<T> tableClass,Collection<K> keys);
+	/**
+	 * 批量删除
+	 * @param <T>
+	 * @param tableInfo
+	 * @param keys
+	 */
+	<T> void delete(TableInfo<T> tableInfo,Collection<Object> keys);
 	
 	
 }

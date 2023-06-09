@@ -41,7 +41,7 @@ public class DeleteByIdsHandler<T> extends DeleteHandler<T>{
 				//删除缓存
 				CacheManager manager = context.getCacheManager();
 				if(manager != null) {
-					manager.delete(tableInfo.getEntityClass(), Arrays.asList(ids));
+					manager.delete(tableInfo, Arrays.asList(ids));
 				}
 			}
 		}

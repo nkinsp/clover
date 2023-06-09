@@ -4,7 +4,10 @@ import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
+import java.util.concurrent.TimeUnit;
 
+import com.github.nkinsp.clover.cache.CacheKeyGenerator;
+import com.github.nkinsp.clover.cache.impl.DefaultCacheKeyGenderatorImpl;
 import com.github.nkinsp.clover.code.PrimaryKeyGenerator;
 import com.github.nkinsp.clover.enums.PrimaryKeyType;
 
@@ -53,17 +56,30 @@ public @interface Table {
 	
 	
 	/**
-	 * 
-	 * @return
-	 */
-	String keySequence() default "";
-	
-	
-	/**
 	 * 是否缓存 
 	 * @return
 	 */
 	boolean cache() default false;
+
+	
+	/**
+	 * 缓存时间单位（秒）
+	 * @return
+	 */
+	TimeUnit cacheTimeUnit() default TimeUnit.SECONDS;
+	
+	/**
+	 * 缓存时间
+	 * @return
+	 */
+	long cacheTime() default 0;
+	
+	
+	/**
+	 * 缓存key生成
+	 * @return
+	 */
+	Class<?> cacheKeyGenerator() default DefaultCacheKeyGenderatorImpl.class;
 
 
 }

@@ -130,13 +130,13 @@ public class RepositoryFactoryBean implements FactoryBean<Object>,InvocationHand
 	}
 
 	private QueryWrapper<?> buildMethodParamQueryWrapper(Method method,Object[] args){
-		QueryWrapper<?> wrapper = new QueryWrapper<>(tableInfo);
+		QueryWrapper<?> wrapper = new QueryWrapper<>(getTableInfo());
 		addCondition(wrapper, method, args);
 		return wrapper;
 	}
 	
 	private DeleteWrapper<?> buildMethodParamDeleteWrapper(Method method,Object[] args){
-		DeleteWrapper<?> wrapper = new  DeleteWrapper<>(tableInfo);
+		DeleteWrapper<?> wrapper = new  DeleteWrapper<>(getTableInfo());
 		addCondition(wrapper, method, args);
 		return wrapper;
 	}
@@ -145,8 +145,7 @@ public class RepositoryFactoryBean implements FactoryBean<Object>,InvocationHand
 	public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
 
 		if (method.isDefault()) {
-			int key = repositoryInterface.getName().hashCode()^method.hashCode();
-			MethodHandle handle = methodHandleMap.computeIfAbsent(key, (s) ->getMethodHandle(proxy, method));
+			MethodHandle handle =  getMethodHandle(proxy, method);
 			return handle.invokeWithArguments(args);
 		}
 		String methodName = method.getName();
@@ -183,11 +182,20 @@ public class RepositoryFactoryBean implements FactoryBean<Object>,InvocationHand
 	}
 
 	private MethodHandle getMethodHandle(Object proxy, Method method) {
-		try {
-			return MethodHandles.lookup().unreflectSpecial(method, method.getDeclaringClass()).bindTo(proxy);
-		} catch (IllegalAccessException e) {
-			throw new RuntimeException(e);
-		}
+
+		int key = repositoryInterface.hashCode() ^ method.hashCode();
+
+		MethodHandle handle = methodHandleMap.computeIfAbsent(key, s -> {
+
+			try {
+				return MethodHandles.lookup().unreflectSpecial(method, method.getDeclaringClass()).bindTo(proxy);
+			} catch (IllegalAccessException e) {
+				throw new RuntimeException(e);
+			}
+		});
+
+		return handle;
+
 	}
 
 	@Override
