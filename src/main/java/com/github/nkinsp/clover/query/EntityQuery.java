@@ -7,7 +7,7 @@ public interface EntityQuery<En> {
 	 * 查询条件
 	 * @param wrapper
 	 */
-	void then(QueryWrapper<En> wrapper);
+	default void then(QueryWrapper<En> wrapper) {}
 	
 	/**
 	 * 排序

@@ -7,5 +7,7 @@ public interface PagingEntityQuery<T> extends EntityQuery<T>{
 	 * 设置分页信息
 	 * @return
 	 */
-	PagingInfo paging();
+	default PagingInfo paging() {
+		return new PagingInfo(1, 15);
+	}
 }

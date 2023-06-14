@@ -182,15 +182,25 @@ public class RepositoryFactoryBean implements FactoryBean<Object>,InvocationHand
 	}
 
 	private MethodHandle getMethodHandle(Object proxy, Method method) {
-
-		int key = repositoryInterface.hashCode() ^ method.hashCode();
+		
+		StringBuilder methodKey = new StringBuilder();
+		methodKey.append(repositoryInterface.getName());
+		methodKey.append(method.getName());
+		
+		for (Class<?> paramType : method.getParameterTypes()) {
+			methodKey.append(paramType.getName());
+			
+		}
+		
+		int key = methodKey.hashCode();
+		
 
 		MethodHandle handle = methodHandleMap.computeIfAbsent(key, s -> {
 
 			try {
 				return MethodHandles.lookup().unreflectSpecial(method, method.getDeclaringClass()).bindTo(proxy);
 			} catch (IllegalAccessException e) {
-				throw new RuntimeException(e);
+				throw new RuntimeException("get Method %s err=>%s".formatted(method.getName(),e.getMessage()));
 			}
 		});
 

@@ -18,7 +18,7 @@ public class EqConditionAdapter implements ConditionAdapter<Eq>{
 
 	@Override
 	public  Consumer<Condition<?>> adapter(Annotation annotation, String name, Object value) {
-		
+	
 		Eq eq = (Eq) annotation;
 		String column = ObjectUtils.isEmpty(eq.value())?name:eq.value();
 		Convert convert = ConvertManager.getConvert(eq.convert());

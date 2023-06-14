@@ -217,6 +217,36 @@ public interface BaseRepository<Id, En> {
 	}
 	
 	/**
+	 * 分页查询
+	 * @param <R>
+	 * @param resultType
+	 * @param pageNum
+	 * @param pageSize
+	 * @param consumer
+	 * @return
+	 */
+	default<R> Rows<R> findRowsBy(Class<R> resultType,Integer pageNum,Integer pageSize,Consumer<QueryWrapper<En>> consumer) {
+		
+		PagingQueryWrapper<En> queryWrapper = new PagingQueryWrapper<En>(tableInfo(),dbContext().getDbType(),pageNum,pageSize);
+		consumer.accept(queryWrapper);
+		return dbContext().executeHandler(new FindEntityRowMapperHandler<>(resultType, queryWrapper));
+		
+	}
+	
+	/**
+	 * 分页查询
+	 * @param pageNum
+	 * @param pageSize
+	 * @param consumer
+	 * @return
+	 */
+	default Rows<En> findRowsBy(Integer pageNum,Integer pageSize,Consumer<QueryWrapper<En>> consumer) {
+		
+		return findRowsBy(tableInfo().getEntityClass(), pageNum, pageSize, consumer);
+		
+	}
+	
+	/**
 	 * Map参数查询
 	 * @param map
 	 * @return
@@ -224,6 +254,8 @@ public interface BaseRepository<Id, En> {
 	default Rows<En> findRowsOf(Map<String, Object> map) {
 		return findRowsBy(wrapper->wrapper.allEq(map));
 	}
+	
+	
 
 	/**
 	 * 通过实体参数查询
@@ -279,6 +311,7 @@ public interface BaseRepository<Id, En> {
 				pagingQuery)
 		);
 	}
+	
 	
 	
 	/**
