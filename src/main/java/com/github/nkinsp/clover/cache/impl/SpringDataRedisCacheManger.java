@@ -42,7 +42,7 @@ public class SpringDataRedisCacheManger implements CacheManager {
 	public <T> T get(TableInfo<T> tableInfo, Object key) {
 		
 		String cacheKey = getCacheKey(tableInfo, key);
-		
+				
 		return (T) redisTemplate.opsForValue().get(cacheKey);
 	}
 

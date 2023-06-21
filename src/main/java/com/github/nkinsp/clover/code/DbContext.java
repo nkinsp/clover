@@ -160,7 +160,7 @@ public class DbContext extends JdbcTemplate{
 		
 		if(tableInfo.getPrimaryKeyType() == PrimaryKeyType.INPUT) {
 			
-			if(keyGenerator == null) {
+			if(keyGenerator != null) {
 				
 				return keyGenerator.createId(this, tableInfo);
 			}
