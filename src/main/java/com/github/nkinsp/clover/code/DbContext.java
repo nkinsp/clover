@@ -210,6 +210,9 @@ public class DbContext extends JdbcTemplate{
 				}
 			}
 		}
+		
+		//
+		query.then(wrapper);
 	}
 	
 	
