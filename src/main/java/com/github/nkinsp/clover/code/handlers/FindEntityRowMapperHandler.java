@@ -88,7 +88,7 @@ public class FindEntityRowMapperHandler<E, T> implements ExecuteHandler<Rows<E>>
 						CascadeInfo cascadeInfo = entityFieldInfo.getCascadeInfo();
 						CascadeAdapter adapter = cascadeAdapters.get(cascadeInfo.getJoinType());
 						if (adapter != null) {
-							adapter.adapter(context,tableInfo, results, entityFieldInfo);
+							adapter.adapter(context,tableInfo,entityMapper,results, entityFieldInfo);
 						}
 					});
 

@@ -26,20 +26,19 @@ public class OneToOneCascadeAdapter implements CascadeAdapter{
 	}
 
 	@Override
-	public <E,R> void adapter(DbContext dbContext,TableInfo<E> tableInfo,List<R> data, EntityFieldInfo entityFieldInfo) {
+	public <E,R> void adapter(DbContext dbContext,TableInfo<E> tableInfo,EntityMapper mapper,List<R> data, EntityFieldInfo entityFieldInfo) {
 	
 	
 		if (CollectionUtils.isEmpty(data)) {
 			return;
 		}
-		CascadeInfo info = entityFieldInfo.getCascadeInfo();
 		
-		EntityMapper mapper = tableInfo.getEntityMapper();
+		
+		CascadeInfo info = entityFieldInfo.getCascadeInfo();		
 		
 		EntityFieldInfo joinColumnField = mapper.get(info.getJoinColumn());
-		
+				
 		List<Object> joinFieldValues = data.stream().map(x->joinColumnField.invokeGet(x)).distinct().collect(Collectors.toList());
-		
 		
 		Class<?> joinTable = info.getJoinTable();
 		

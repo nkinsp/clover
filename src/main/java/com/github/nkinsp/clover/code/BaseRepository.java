@@ -128,7 +128,7 @@ public interface BaseRepository<Id, En> {
 	 * @param consumer
 	 * @return
 	 */
-	default int updateBy(Consumer<Condition<UpdateWrapper<En>>> consumer) {
+	default int updateBy(Consumer<UpdateWrapper<En>> consumer) {
 
 		UpdateWrapper<En> wrapper = new UpdateWrapper<>(tableInfo());
 		consumer.accept(wrapper);

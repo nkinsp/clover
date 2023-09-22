@@ -15,6 +15,7 @@ import com.github.nkinsp.clover.table.CascadeInfo;
 import com.github.nkinsp.clover.table.EntityFieldInfo;
 import com.github.nkinsp.clover.table.EntityMapper;
 import com.github.nkinsp.clover.table.TableInfo;
+import com.github.nkinsp.clover.util.EntityMapperManager;
 import com.github.nkinsp.clover.util.ObjectUtils;
 
 public class OneToManyCascadeAdapter implements CascadeAdapter{
@@ -96,7 +97,7 @@ public class OneToManyCascadeAdapter implements CascadeAdapter{
 	}
 
 	@Override
-	public <E,R> void adapter(DbContext dbContext,TableInfo<E> tableInfo,List<R> data, EntityFieldInfo entityFieldInfo) {
+	public <E,R> void adapter(DbContext dbContext,TableInfo<E> tableInfo,EntityMapper entityMapper,List<R> data, EntityFieldInfo entityFieldInfo) {
 	
 	
 		
@@ -107,9 +108,7 @@ public class OneToManyCascadeAdapter implements CascadeAdapter{
 		CascadeInfo info = entityFieldInfo.getCascadeInfo();
 		
 		boolean joinMiddleTable = info.getMiddleTable() != void.class;
-		
-		EntityMapper entityMapper = tableInfo.getEntityMapper();
-		
+				
 		String joinName = joinMiddleTable?tableInfo.getPrimaryKeyName():info.getJoinColumn();
 		
 		EntityFieldInfo joinFieldInfo = entityMapper.get(joinName);
