@@ -29,6 +29,14 @@ public interface Condition<S extends Condition<S>> {
 	 * @return
 	 */
 	S eq(String column, Object value);
+	
+	/**
+	 * and =
+	 * @param cloumn
+	 * @param value
+	 * @return
+	 */
+	S andEq(String cloumn,Object value);
 
 	/**
 	 * 不等于
@@ -77,6 +85,9 @@ public interface Condition<S extends Condition<S>> {
 	 */
 	S where();
 	
+	
+	S where(String sql,Object...params);
+	
 	/**
 	 * and 
 	 * @return
@@ -105,6 +116,8 @@ public interface Condition<S extends Condition<S>> {
 	 * @return
 	 */
 	S in(String column, Object... params);
+	
+	
 
 	/**
 	 * field in (sql)

@@ -61,10 +61,21 @@ public abstract class AbstractWrapper<S extends AbstractWrapper<S>>  implements 
 	public S where() {
 		return typeThis;
 	}
+	
+	@Override
+	public S where(String sql, Object... params) {
+		return excerpt(sql, params);
+	}
+	
 
 	@Override
 	public S eq(String column, Object value) {
 		return excerpt(SqlKeyword.EQ.format(colunmFormat(column)), value);
+	}
+	
+	@Override
+	public S andEq(String cloumn, Object value) {
+		return and().eq(cloumn, value);
 	}
 
 	@Override

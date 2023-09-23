@@ -24,6 +24,8 @@ import org.springframework.util.ClassUtils;
 import com.github.nkinsp.clover.code.handlers.DeleteHandler;
 import com.github.nkinsp.clover.code.handlers.FindByQueryHandler;
 import com.github.nkinsp.clover.code.handlers.FindEntityRowMapperHandler;
+import com.github.nkinsp.clover.code.handlers.FindForObjectHandler;
+import com.github.nkinsp.clover.enums.SqlKeyword;
 import com.github.nkinsp.clover.query.AbstractWrapper;
 import com.github.nkinsp.clover.query.Condition;
 import com.github.nkinsp.clover.query.ConditionAdapter;
@@ -169,9 +171,8 @@ public class RepositoryFactoryBean implements FactoryBean<Object>,InvocationHand
 		
 		if(methodName.startsWith("findCountBy")) {
 			QueryWrapper<?> wrapper = buildMethodParamQueryWrapper(method, args);
-			wrapper.select("COUNT(1)");
-			return getDbContext().executeHandler(new FindByQueryHandler<>(returnType, wrapper));
-			
+			wrapper.select(SqlKeyword.COUNT.format("1"));
+			return getDbContext().executeHandler(new FindForObjectHandler<>(returnType, wrapper));
 			
 		}
 		if (methodName.startsWith("deleteBy")) {
