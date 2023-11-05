@@ -22,7 +22,7 @@ public class NeConditionAdapter implements ConditionAdapter<Ne>{
 		Ne an = (Ne) annotation;
 		String column = ObjectUtils.isEmpty(an.value())?name:an.value();
 		Convert convert = ConvertManager.getConvert(an.convert());
-		return x->x.eq(column, convert.to(value));
+		return x->x.ne(column, convert.to(value));
 	}
 
 	

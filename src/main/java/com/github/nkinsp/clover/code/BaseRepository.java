@@ -135,7 +135,8 @@ public interface BaseRepository<Id, En> {
 
 		return dbContext().executeHandler(new UpdateHandler<En>(wrapper));
 	}
-
+	
+	
 	/**
 	 * 主键id 查询
 	 * 
@@ -167,6 +168,7 @@ public interface BaseRepository<Id, En> {
 	 */
 	default <R> R findBy(Class<R> resultType, Consumer<Condition<QueryWrapper<En>>> consumer) {
 		QueryWrapper<En> queryWrapper = new QueryWrapper<En>(tableInfo());
+		consumer.accept(queryWrapper);
 		return dbContext().executeHandler(new FindByQueryHandler<R, En>(resultType, queryWrapper));
 	}
 
