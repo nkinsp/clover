@@ -30,7 +30,6 @@ public class FindRowsByQueryPagingEntityParamHandler<T,E> extends FindRowsByQuer
 	
 		PagingQueryWrapper<T> wrapper = new PagingQueryWrapper<>(getTableInfo(),this.dbType,paging.getPageNum(),paging.getPageSize());
 		
-//		entityQuery.then(wrapper);
 		
 		String orderBy = entityQuery.orderBy();
 		
