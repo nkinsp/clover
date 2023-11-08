@@ -1,6 +1,7 @@
 package com.github.nkinsp.clover.query;
 
 
+import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -37,8 +38,8 @@ public class QueryWrapper<En> extends AbstractWrapper<QueryWrapper<En>>{
 		return this;
 	}
 
-	public QueryWrapper<En> select(String prefix,String...columns) {
-		columnBuilder.add(prefix, columns);
+	public QueryWrapper<En> select(String prefix,List<String> columns) {
+		columnBuilder.add(prefix, columns.toArray(String[]::new));
 		return this;
 	}
 	
