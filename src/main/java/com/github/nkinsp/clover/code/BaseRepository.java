@@ -187,7 +187,7 @@ public interface BaseRepository<Id, En> {
 	 * @param consumer
 	 * @return
 	 */
-	default Rows<En> findRowsBy(Consumer<Condition<QueryWrapper<En>>> consumer) {
+	default Rows<En> findRowsBy(Consumer<QueryWrapper<En>> consumer) {
 		
 		QueryWrapper<En> queryWrapper = new QueryWrapper<En>(tableInfo());
 		consumer.accept(queryWrapper);
