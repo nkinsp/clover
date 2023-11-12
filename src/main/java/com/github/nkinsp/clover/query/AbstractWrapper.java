@@ -130,6 +130,7 @@ public abstract class AbstractWrapper<S extends AbstractWrapper<S>>  implements 
 	@Override
 	public <T> S in(String column, Class<T> tableClass, Consumer<QueryWrapper<T>> consumer) {
 		QueryWrapper<T> wrapper = new QueryWrapper<T>(tableClass);
+		consumer.accept(wrapper);
 		return excerpt(SqlKeyword.IN.format(colunmFormat(column),wrapper.buildSql()), wrapper.getParams().toArray());
 		
 	}
