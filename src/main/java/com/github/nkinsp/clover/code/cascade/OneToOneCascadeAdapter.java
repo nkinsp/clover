@@ -16,6 +16,9 @@ import com.github.nkinsp.clover.table.EntityMapper;
 import com.github.nkinsp.clover.table.TableInfo;
 import com.github.nkinsp.clover.util.ObjectUtils;
 
+import lombok.extern.slf4j.Slf4j;
+
+@Slf4j
 public class OneToOneCascadeAdapter implements CascadeAdapter{
 
 	
@@ -49,12 +52,14 @@ public class OneToOneCascadeAdapter implements CascadeAdapter{
 
 		
 		Rows<?> rows = repository.findByIds(joinFieldValues);
-		
 	
 				
 		EntityMapper entityMapper = joinTableInfo.getEntityMapper();
+			
 		
-		EntityFieldInfo idFieldInfo = entityMapper.get( tableInfo.getPrimaryKeyName());
+		EntityFieldInfo idFieldInfo = entityMapper.get( joinTableInfo.getPrimaryKeyName());
+		
+		
 
 		Map<Object, ?> joinDataMap = rows.toMap(x->idFieldInfo.invokeGet(x),v->ObjectUtils.copy(info.getResultTypeClass(), v));
 		
