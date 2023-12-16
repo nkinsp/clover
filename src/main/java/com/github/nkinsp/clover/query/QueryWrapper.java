@@ -1,9 +1,12 @@
 package com.github.nkinsp.clover.query;
 
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
+
+import org.springframework.util.StringUtils;
 
 import com.github.nkinsp.clover.code.DbContext;
 import com.github.nkinsp.clover.enums.SqlKeyword;
@@ -26,6 +29,11 @@ public class QueryWrapper<En> extends AbstractWrapper<QueryWrapper<En>>{
 	
 	@Getter
 	private String groupBy;
+	
+	@Getter
+	private List<String> joins = new ArrayList<>();
+	
+	private String tableAlias;
 	
 	public QueryWrapper<En> select(String column) {
 		return select(new String[] {column});
@@ -51,6 +59,12 @@ public class QueryWrapper<En> extends AbstractWrapper<QueryWrapper<En>>{
 	public <T> QueryWrapper<En> select(String prefix,Class<T> entityClass){
 		columnBuilder.add(prefix,entityClass);
 		return this;		
+	}
+	
+
+	public QueryWrapper<En> setSelectColumns(String...cols){
+		this.columnBuilder = new ColumnBuilder();
+		return select(cols);
 	}
 	
 	
@@ -85,6 +99,54 @@ public class QueryWrapper<En> extends AbstractWrapper<QueryWrapper<En>>{
 		return this.tableInfo.getEntityClass();
 	}
 	
+	
+	public QueryWrapper<En> innerJoin(String table,String condition){
+		
+		joins.add("INNER JOIN "+table+" ON "+condition);
+		return this;
+		
+	}
+	
+	public QueryWrapper<En> innerJoin(Class<?> table,String alias,String condition){
+		
+		TableInfo<?> info = DbContext.getTableInfo(table);
+		return innerJoin(info.getTableName()+" AS "+alias, condition);
+		
+	}
+	
+	public QueryWrapper<En> leftJoin(String table,String condition){
+		
+		joins.add("LEFT JOIN "+table+" ON "+condition);
+		return this;
+		
+	}
+	
+	public QueryWrapper<En> leftJoin(Class<?> table,String alias,String condition){
+		
+		
+		TableInfo<?> info = DbContext.getTableInfo(table);
+		
+		return leftJoin(info.getTableName()+" AS "+alias, condition);
+		
+	}
+	
+	public QueryWrapper<En> rightJoin(String table,String condition){
+		
+		joins.add("RIGHT JOIN "+table+" ON "+condition);
+		return this;
+		
+	}
+	
+	public QueryWrapper<En> rightJoin(Class<?> table,String alias,String condition){
+		
+		
+		TableInfo<?> info = DbContext.getTableInfo(table);
+		
+		return rightJoin(info.getTableName()+" AS "+alias, condition);
+		
+	}
+	
+	
 	@Override
 	public String buildSql() {
 	
@@ -94,6 +156,14 @@ public class QueryWrapper<En> extends AbstractWrapper<QueryWrapper<En>>{
 		String sql = SqlKeyword.SELECT_SQL.format(columns,tableInfo.getTableName());
 		
 		StringBuilder sqlBuilder = new StringBuilder(sql).append(" ");
+		if(StringUtils.hasText(tableAlias)) {
+			sqlBuilder.append("AS").append(" ").append(tableAlias).append(" ");
+		}
+		if(!joins.isEmpty()) {	
+			for (String join : joins) {
+				sqlBuilder.append(join).append(" ");
+			}
+		}
 		if(!getConditions().isEmpty()) {
 			sqlBuilder.append(SqlKeyword.WHERE.value)
 							.append(" ")
@@ -113,6 +183,11 @@ public class QueryWrapper<En> extends AbstractWrapper<QueryWrapper<En>>{
 		}
 
 		return sqlBuilder.toString();
+	}
+
+	public QueryWrapper<En> tableAlias(String tableAlias) {
+		this.tableAlias = tableAlias;
+		return this;
 	}
 
 	

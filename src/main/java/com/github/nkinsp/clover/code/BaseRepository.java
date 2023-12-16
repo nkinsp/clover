@@ -316,6 +316,7 @@ public interface BaseRepository<Id, En> {
 	
 	
 	
+	
 	/**
 	 * 实体条件分页查询
 	 * @param pagingEntityQuery
@@ -383,15 +384,19 @@ public interface BaseRepository<Id, En> {
 	
 	/**
 	 * 根据实体参数查询
+	 * 
 	 * @param entityQuery
 	 * @return
 	 */
 	default Long findCountOf(EntityQuery<En> entityQuery) {
-		
+
 		QueryWrapper<En> wrapper = new QueryWrapper<>(tableInfo());
-		wrapper.select(SqlKeyword.COUNT.format("1"));
-		return dbContext().executeHandler(new FindForObjectByQueryEntityParamHandler<>(Long.class, entityQuery, wrapper));
-		
+
+		FindForObjectByQueryEntityParamHandler<Long, En> handler = new FindForObjectByQueryEntityParamHandler<>(
+				Long.class, entityQuery, wrapper, SqlKeyword.COUNT.format("1"));
+
+		return dbContext().executeHandler(handler);
+
 	}
 	
 	

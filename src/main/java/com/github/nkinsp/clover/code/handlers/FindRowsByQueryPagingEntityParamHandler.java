@@ -1,5 +1,7 @@
 package com.github.nkinsp.clover.code.handlers;
 
+import java.util.function.Consumer;
+
 import org.springframework.util.StringUtils;
 
 import com.github.nkinsp.clover.enums.DbType;
@@ -13,8 +15,7 @@ public class FindRowsByQueryPagingEntityParamHandler<T,E> extends FindRowsByQuer
 
 	private PagingEntityQuery<T> entityQuery;
 	
-	private DbType dbType;
-	
+	private DbType dbType;	
 
 	public FindRowsByQueryPagingEntityParamHandler(Class<E> entityClass,TableInfo<T> tableInfo,DbType dbType, PagingEntityQuery<T> query) {
 		super(entityClass,tableInfo, query);
