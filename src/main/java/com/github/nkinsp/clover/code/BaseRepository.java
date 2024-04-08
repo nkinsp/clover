@@ -156,7 +156,7 @@ public interface BaseRepository<Id, En> {
 	default En findBy(Consumer<Condition<QueryWrapper<En>>> consumer) {
 
 		QueryWrapper<En> queryWrapper = new QueryWrapper<En>(tableInfo());
-		consumer.accept(queryWrapper);
+		consumer.accept(queryWrapper); 
 		return dbContext().executeHandler(new FindByQueryHandler<>(queryWrapper.getTableClass(), queryWrapper));
 
 	}
