@@ -49,7 +49,14 @@ public class DbContextConfiguration implements ImportBeanDefinitionRegistrar {
 		for (BeanDefinitionHolder beanDefinitionHolder : beanDefinitionHolders) {
 			
 			registry.removeBeanDefinition(beanDefinitionHolder.getBeanName());
-			String beanClassName = beanDefinitionHolder.getBeanDefinition().getBeanClassName();
+			 BeanDefinition definition = beanDefinitionHolder.getBeanDefinition();
+			 
+			
+			String beanClassName = definition.getBeanClassName();
+			
+			
+			Class<?> beanClass = com.github.nkinsp.clover.util.ClassUtils.forName(beanClassName);
+			
 		
 			BeanDefinitionBuilder builder = BeanDefinitionBuilder.genericBeanDefinition(RepositoryFactoryBean.class);
 			builder.addPropertyValue("repositoryInterfaceClassName", beanClassName);
@@ -59,7 +66,7 @@ public class DbContextConfiguration implements ImportBeanDefinitionRegistrar {
 			
 			AbstractBeanDefinition beanDefinition = builder.getBeanDefinition();
 			
-			beanDefinition.setAttribute(FactoryBean.OBJECT_TYPE_ATTRIBUTE,beanClassName);
+			beanDefinition.setAttribute(FactoryBean.OBJECT_TYPE_ATTRIBUTE,beanClass);
 					
 			registry.registerBeanDefinition(beanDefinitionHolder.getBeanName(),beanDefinition);
 			

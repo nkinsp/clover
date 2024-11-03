@@ -8,8 +8,7 @@ import java.lang.annotation.Target;
 import com.github.nkinsp.clover.convert.Convert;
 import com.github.nkinsp.clover.convert.impl.DefaultConvert;
 
-
-@Target({ElementType.FIELD})
+@Target({ElementType.FIELD, ElementType.PARAMETER})
 @Retention(RetentionPolicy.RUNTIME)
 public @interface Le {
 

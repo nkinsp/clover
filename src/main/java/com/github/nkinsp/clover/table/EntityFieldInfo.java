@@ -8,6 +8,7 @@ import java.util.List;
 
 import org.springframework.beans.BeanUtils;
 
+import com.alibaba.fastjson.JSONObject;
 import com.github.nkinsp.clover.annotation.CascadeMapperColumn;
 import com.github.nkinsp.clover.annotation.Column;
 import com.github.nkinsp.clover.enums.JoinType;

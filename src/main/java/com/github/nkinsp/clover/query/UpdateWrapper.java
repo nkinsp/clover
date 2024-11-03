@@ -16,6 +16,8 @@ public class UpdateWrapper<T> extends AbstractWrapper<UpdateWrapper<T>>{
 	@Getter
 	private TableInfo<T> tableInfo;
 
+	
+	@Getter
 	private Map<String, String> updateColumns = new LinkedHashMap<String, String>();
 	
 	public UpdateWrapper(TableInfo<T> tableInfo) {

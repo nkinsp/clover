@@ -3,7 +3,6 @@ package com.github.nkinsp.clover.code.cascade;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
 import java.util.stream.Collectors;
 
 import org.springframework.util.CollectionUtils;
@@ -19,7 +18,7 @@ import com.github.nkinsp.clover.table.TableInfo;
 import com.github.nkinsp.clover.util.EntityMapperManager;
 import com.github.nkinsp.clover.util.ObjectUtils;
 
-public class OneToManyCascadeAdapter implements CascadeAdapter{
+public class ManeyToManyCascadeAdapter implements CascadeAdapter{
 
 	
 	@Override
@@ -50,7 +49,7 @@ public class OneToManyCascadeAdapter implements CascadeAdapter{
 		Rows<?> middleRows = middleRepository.findRowsBy(s -> s.where().in(joinColumn.getColumnName(), joinFieldValues));
 		
 		//中间表外表的列 数据
-		List<Object> inverseValues = middleRows.map(inverseColumn::invokeGet).distinct()
+		List<Object> inverseValues = middleRows.map(x -> inverseColumn.invokeGet(x)).distinct()
 				.collect(Collectors.toList());
 
 		//关联表
@@ -60,10 +59,10 @@ public class OneToManyCascadeAdapter implements CascadeAdapter{
 
 		EntityFieldInfo joinTableIdInfo = joinTableInfo.getEntityMapper().get(joinTableInfo.getPrimaryKeyName());
 
-		Map<Object, ?> middleRowMap = middleRows.collect(Collectors.groupingBy(joinColumn::invokeGet));
+		Map<Object, ?> middleRowMap = middleRows.collect(Collectors.groupingBy(x -> joinColumn.invokeGet(x)));
 
 		Map<Object, ?> joinDataMap = joinTableRepository.findByIds(inverseValues)
-				.toMap(joinTableIdInfo::invokeGet, v -> ObjectUtils.copy(info.getResultTypeClass(), v));
+				.toMap(x -> joinTableIdInfo.invokeGet(x), v -> ObjectUtils.copy(info.getResultTypeClass(), v));
 
 		Map<Object, List<?>> dataMap = new HashMap<>(middleRowMap.size());
 
@@ -71,7 +70,7 @@ public class OneToManyCascadeAdapter implements CascadeAdapter{
 
 			List<?> values = (List<?>) value;
 
-			List<?> list = values.stream().map(x -> joinDataMap.get(inverseColumn.invokeGet(x))).filter(Objects::nonNull)
+			List<?> list = values.stream().map(x -> joinDataMap.get(inverseColumn.invokeGet(x))).filter(x -> x != null)
 					.collect(Collectors.toList());
 
 			dataMap.put(key, list);
@@ -91,7 +90,7 @@ public class OneToManyCascadeAdapter implements CascadeAdapter{
 		EntityFieldInfo inverseField = tableInfo.getEntityMapper().get(info.getInverseColumn());
 		
 		Map<Object, ?> inverseDataMap = joinRepository.findRowsBy(info.getResultTypeClass(),s->s.where().in(inverseField.getColumnName(), joinFieldValues))
-		.collect(Collectors.groupingBy(inverseField::invokeGet));
+		.collect(Collectors.groupingBy(x->inverseField.invokeGet(x)));
 		
 
 		return inverseDataMap;
@@ -120,7 +119,7 @@ public class OneToManyCascadeAdapter implements CascadeAdapter{
 		
 	
 		
-		Object[] joinFieldValues = data.stream().map(joinFieldInfo::invokeGet).filter(Objects::nonNull).toArray();
+		Object[] joinFieldValues = data.stream().map(x->joinFieldInfo.invokeGet(x)).toArray();
 		
 		Map<Object, ?> dataMap = joinMiddleTable?getMiddleMapData(dbContext,info, joinFieldValues):getJoinDataMap(dbContext,info, joinFieldValues);
 		

@@ -70,6 +70,7 @@ public class DbContext extends JdbcTemplate{
 	@Setter
 	private KeyGenerator keyGenerator;
 	
+	@Setter
 	@Getter
 	private DbType dbType;
 	
@@ -97,12 +98,25 @@ public class DbContext extends JdbcTemplate{
 		
 		
 	}
+	public DbContext(DataSource dataSource,DbType dbType) {
+		super(dataSource);
+		this.dbType = dbType;
+		
+		
+	}
 	
 	
 	public DbContext(DataSource dataSource,CacheManager cacheManager) {
 		this(dataSource);
 		this.cacheManager = cacheManager;
 	}
+	public DbContext(DataSource dataSource,DbType dbType,CacheManager cacheManager) {
+		this(dataSource,dbType);
+		this.cacheManager = cacheManager;
+	}
+	
+	
+	
 	
 	@SuppressWarnings("unchecked")
 	public static <T> TableInfo<T> getTableInfo(Class<T> tableClass) {
@@ -229,6 +243,11 @@ public class DbContext extends JdbcTemplate{
 	
 	private DbType initDbType() {
 		
+		if(this.dbType != null) {
+			return dbType;
+		}
+		
+		
 		Connection connection = null;
 		try {
 			connection = getDataSource().getConnection();
@@ -242,6 +261,9 @@ public class DbContext extends JdbcTemplate{
 			dbTypeMap.put("jdbc:db2:",DbType.DB2);
 			dbTypeMap.put("jdbc:sqlserver:",DbType.SQLSERVER);
 			dbTypeMap.put("jdbc:h2:", DbType.H2);
+			
+			
+			
 			for (Entry<String,DbType> en : dbTypeMap.entrySet()) {
 				if(url.startsWith(en.getKey())) {
 					return en.getValue();

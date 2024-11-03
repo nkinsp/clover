@@ -1,12 +1,13 @@
 package com.github.nkinsp.clover.code.handlers;
 
 
+
 import com.github.nkinsp.clover.code.DbContext;
 import com.github.nkinsp.clover.query.EntityQuery;
 import com.github.nkinsp.clover.query.QueryWrapper;
 import com.github.nkinsp.clover.result.Rows;
 import com.github.nkinsp.clover.table.TableInfo;
-
+import com.github.nkinsp.clover.util.StringUtils;
 
 import lombok.Getter;
 
@@ -35,8 +36,17 @@ public class FindRowsByQueryEntityParamHandler<T,E> implements ExecuteHandler<Ro
 		QueryWrapper<T> wrapper = createQueryWrapper();
 		
 		context.appendWrapperParmas(wrapper,this.query);
+		
+		if(!StringUtils.isEmpty(query.orderBy())){
+			wrapper.orderBy(query.orderBy());
+		}
+		
+		
+	
 
 		Rows<E> rows = new FindEntityRowMapperHandler<>(entityClass, wrapper).handle(context);
+		
+		
 
 		return rows;
 	}

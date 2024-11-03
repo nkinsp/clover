@@ -42,6 +42,10 @@ public class BeanRowMapper<T> implements RowMapper<T>{
 				}
 				continue;
 			}
+			
+			
+			
+			
 			PropertyDescriptor pd = fieldInfo.getProperty();
 			try {
 				Object value = JdbcUtils.getResultSetValue(rs, index, pd.getPropertyType());

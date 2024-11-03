@@ -2,6 +2,7 @@ package com.github.nkinsp.clover.code.cascade;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 import org.springframework.util.CollectionUtils;
@@ -41,7 +42,11 @@ public class OneToOneCascadeAdapter implements CascadeAdapter{
 		
 		EntityFieldInfo joinColumnField = mapper.get(info.getJoinColumn());
 				
-		List<Object> joinFieldValues = data.stream().map(x->joinColumnField.invokeGet(x)).distinct().collect(Collectors.toList());
+		List<Object> joinFieldValues = data.stream()
+				.map(joinColumnField::invokeGet)
+				.filter(Objects::nonNull)
+				.distinct()
+				.collect(Collectors.toList());
 		
 		Class<?> joinTable = info.getJoinTable();
 		
@@ -61,7 +66,7 @@ public class OneToOneCascadeAdapter implements CascadeAdapter{
 		
 		
 
-		Map<Object, ?> joinDataMap = rows.toMap(x->idFieldInfo.invokeGet(x),v->ObjectUtils.copy(info.getResultTypeClass(), v));
+		Map<Object, ?> joinDataMap = rows.toMap(idFieldInfo::invokeGet, v->ObjectUtils.copy(info.getResultTypeClass(), v));
 		
 		
 		for (Object object : data) {
