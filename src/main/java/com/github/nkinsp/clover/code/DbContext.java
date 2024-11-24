@@ -5,17 +5,16 @@ import java.lang.reflect.Field;
 import java.sql.Connection;
 import java.sql.DatabaseMetaData;
 import java.sql.SQLException;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.UUID;
+import java.util.*;
 import java.util.Map.Entry;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Consumer;
 
 import javax.sql.DataSource;
 
+import com.github.nkinsp.clover.annotation.EntityCascadeMapper;
+import com.github.nkinsp.clover.result.Rows;
+import com.github.nkinsp.clover.table.CascadeInfo;
 import org.springframework.jdbc.core.JdbcTemplate;
 
 import com.github.nkinsp.clover.cache.CacheManager;
@@ -75,13 +74,13 @@ public class DbContext extends JdbcTemplate{
 	private DbType dbType;
 	
 	@Getter
-	private static List<ConditionAdapter<? extends Annotation>> conditionAdapters = new ArrayList<>();
+	private static final List<ConditionAdapter<? extends Annotation>> conditionAdapters = new ArrayList<>();
 	
 	@Getter
-	private static Map<DbType,DbDialectAdapter> dialectAdapters = new HashMap<>();
+	private static final Map<DbType,DbDialectAdapter> dialectAdapters = new HashMap<>();
 	
 	@Getter
-	private static Map<JoinType, CascadeAdapter> cascadeAdapters = new HashMap<>();
+	private static final Map<JoinType, CascadeAdapter> cascadeAdapters = new HashMap<>();
 	
 	static {
 		
@@ -228,15 +227,35 @@ public class DbContext extends JdbcTemplate{
 		//
 		query.then(wrapper);
 	}
+
+	public <E,T> void executeCascadeAdapter(TableInfo<T> tableInfo,Class<E> entityClass, List<E> rows){
+
+		EntityCascadeMapper mapper = entityClass.getAnnotation(EntityCascadeMapper.class);
+
+		if(mapper == null){
+			return;
+		}
+		EntityMapper entityMapper = EntityMapperManager.getEntityMapper(entityClass);
+		Map<JoinType, CascadeAdapter> cascadeAdapters = DbContext.getCascadeAdapters();
+		entityMapper.getEntityFieldInfos()
+				.stream()
+				.filter(EntityFieldInfo::isCascade)
+				.forEach(entityFieldInfo -> {
+					CascadeInfo cascadeInfo = entityFieldInfo.getCascadeInfo();
+					CascadeAdapter adapter = cascadeAdapters.get(cascadeInfo.getJoinType());
+					if (adapter != null) {
+						adapter.adapter(this, tableInfo, entityMapper, rows, entityFieldInfo);
+					}
+				});
+
+    }
 	
 	
 	
 	public static DbDialectAdapter getDialectAdapter(DbType dbType) {
-		
-		
-		DbDialectAdapter adapter = dialectAdapters.get(dbType);
-		
-		return adapter;
+
+
+        return dialectAdapters.get(dbType);
 		
 	}
 
@@ -250,7 +269,7 @@ public class DbContext extends JdbcTemplate{
 		
 		Connection connection = null;
 		try {
-			connection = getDataSource().getConnection();
+			connection = Objects.requireNonNull(getDataSource()).getConnection();
 			DatabaseMetaData metaData =connection.getMetaData();
 			String url = metaData.getURL().toLowerCase();
 			Map<String, DbType> dbTypeMap = new HashMap<>();

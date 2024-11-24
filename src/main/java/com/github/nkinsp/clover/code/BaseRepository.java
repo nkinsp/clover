@@ -4,24 +4,9 @@ import java.util.Collection;
 import java.util.Map;
 import java.util.function.Consumer;
 
+import com.github.nkinsp.clover.code.handlers.*;
 import org.springframework.util.CollectionUtils;
 
-import com.github.nkinsp.clover.code.handlers.DeleteByIdHandler;
-import com.github.nkinsp.clover.code.handlers.DeleteByIdsHandler;
-import com.github.nkinsp.clover.code.handlers.DeleteHandler;
-import com.github.nkinsp.clover.code.handlers.FindByIdHandler;
-import com.github.nkinsp.clover.code.handlers.FindByIdsHandler;
-import com.github.nkinsp.clover.code.handlers.FindByQueryHandler;
-import com.github.nkinsp.clover.code.handlers.FindEntityRowMapperHandler;
-import com.github.nkinsp.clover.code.handlers.FindForObjectByQueryEntityParamHandler;
-import com.github.nkinsp.clover.code.handlers.FindForObjectHandler;
-import com.github.nkinsp.clover.code.handlers.FindPagingQueryHandler;
-import com.github.nkinsp.clover.code.handlers.FindRowsByQueryEntityParamHandler;
-import com.github.nkinsp.clover.code.handlers.FindRowsByQueryPagingEntityParamHandler;
-import com.github.nkinsp.clover.code.handlers.InsertBatchHandler;
-import com.github.nkinsp.clover.code.handlers.InsertHandler;
-import com.github.nkinsp.clover.code.handlers.UpdateEntityHandler;
-import com.github.nkinsp.clover.code.handlers.UpdateHandler;
 import com.github.nkinsp.clover.enums.SqlKeyword;
 import com.github.nkinsp.clover.query.Condition;
 import com.github.nkinsp.clover.query.DeleteWrapper;
@@ -181,6 +166,14 @@ public interface BaseRepository<Id, En> {
 	 */
 	default Rows<En> findByIds(Collection<Id> ids) {
 		return dbContext().executeHandler(new FindByIdsHandler<>(tableInfo(), ids));
+	}
+
+	default <R> Rows<R> findByIds(Class<R> entityClass,Collection<Id> ids) {
+		if (CollectionUtils.isEmpty(ids)) {
+			return new Rows<>();
+		}
+
+		return dbContext().executeHandler(new FindByIdsEntityRowHandler<>(entityClass,tableInfo(),ids));
 	}
 
 	/**

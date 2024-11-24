@@ -5,6 +5,7 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.stream.Collectors;
 
+import com.github.nkinsp.clover.util.EntityMapperManager;
 import org.springframework.util.CollectionUtils;
 
 import com.github.nkinsp.clover.code.BaseRepository;
@@ -17,9 +18,6 @@ import com.github.nkinsp.clover.table.EntityMapper;
 import com.github.nkinsp.clover.table.TableInfo;
 import com.github.nkinsp.clover.util.ObjectUtils;
 
-import lombok.extern.slf4j.Slf4j;
-
-@Slf4j
 public class OneToOneCascadeAdapter implements CascadeAdapter{
 
 	
@@ -36,35 +34,34 @@ public class OneToOneCascadeAdapter implements CascadeAdapter{
 		if (CollectionUtils.isEmpty(data)) {
 			return;
 		}
-		
-		
-		CascadeInfo info = entityFieldInfo.getCascadeInfo();		
-		
+
+		CascadeInfo info = entityFieldInfo.getCascadeInfo();
 		EntityFieldInfo joinColumnField = mapper.get(info.getJoinColumn());
-				
 		List<Object> joinFieldValues = data.stream()
 				.map(joinColumnField::invokeGet)
 				.filter(Objects::nonNull)
 				.distinct()
 				.collect(Collectors.toList());
-		
+
+		if(CollectionUtils.isEmpty(joinFieldValues)){
+			return;
+		}
+
 		Class<?> joinTable = info.getJoinTable();
-		
-		
+
 		BaseRepository<Object, ?> repository = dbContext.createRepository(joinTable);
-		
+
 		TableInfo<?> joinTableInfo = repository.tableInfo();
 
-		
-		Rows<?> rows = repository.findByIds(joinFieldValues);
-	
-				
-		EntityMapper entityMapper = joinTableInfo.getEntityMapper();
-			
-		
-		EntityFieldInfo idFieldInfo = entityMapper.get( joinTableInfo.getPrimaryKeyName());
-		
-		
+		EntityMapper entityMapper = EntityMapperManager.getEntityMapper(info.getResultTypeClass());
+
+		Rows<?> rows = repository.findByIds(entityMapper.getEntityClass(),joinFieldValues);
+
+		if(CollectionUtils.isEmpty(rows)){
+			return;
+		}
+
+		EntityFieldInfo idFieldInfo = entityMapper.get(joinTableInfo.getPrimaryKeyName());
 
 		Map<Object, ?> joinDataMap = rows.toMap(idFieldInfo::invokeGet, v->ObjectUtils.copy(info.getResultTypeClass(), v));
 		
@@ -77,10 +74,7 @@ public class OneToOneCascadeAdapter implements CascadeAdapter{
 			
 			
 		}
-		
 
-		
-		
 		
 	}
 

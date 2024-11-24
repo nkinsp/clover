@@ -49,7 +49,7 @@ public class ManeyToManyCascadeAdapter implements CascadeAdapter{
 		Rows<?> middleRows = middleRepository.findRowsBy(s -> s.where().in(joinColumn.getColumnName(), joinFieldValues));
 		
 		//中间表外表的列 数据
-		List<Object> inverseValues = middleRows.map(x -> inverseColumn.invokeGet(x)).distinct()
+		List<Object> inverseValues = middleRows.map(inverseColumn::invokeGet).distinct()
 				.collect(Collectors.toList());
 
 		//关联表
@@ -59,10 +59,10 @@ public class ManeyToManyCascadeAdapter implements CascadeAdapter{
 
 		EntityFieldInfo joinTableIdInfo = joinTableInfo.getEntityMapper().get(joinTableInfo.getPrimaryKeyName());
 
-		Map<Object, ?> middleRowMap = middleRows.collect(Collectors.groupingBy(x -> joinColumn.invokeGet(x)));
+		Map<Object, ?> middleRowMap = middleRows.collect(Collectors.groupingBy(joinColumn::invokeGet));
 
 		Map<Object, ?> joinDataMap = joinTableRepository.findByIds(inverseValues)
-				.toMap(x -> joinTableIdInfo.invokeGet(x), v -> ObjectUtils.copy(info.getResultTypeClass(), v));
+				.toMap(joinTableIdInfo::invokeGet, v -> ObjectUtils.copy(info.getResultTypeClass(), v));
 
 		Map<Object, List<?>> dataMap = new HashMap<>(middleRowMap.size());
 

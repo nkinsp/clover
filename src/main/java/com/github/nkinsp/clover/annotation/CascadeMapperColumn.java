@@ -44,6 +44,7 @@ public @interface CascadeMapperColumn {
 	 * @return
 	 */
 	String inverseColumn() default "";
+
 	
 	
 	

@@ -3,6 +3,7 @@ package com.github.nkinsp.clover.code;
 import java.lang.annotation.Annotation;
 import java.lang.invoke.MethodHandle;
 import java.lang.invoke.MethodHandles;
+import java.lang.invoke.MethodType;
 import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Method;
 import java.lang.reflect.Parameter;
@@ -15,6 +16,7 @@ import java.util.function.Consumer;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.FactoryBean;
 import org.springframework.context.ApplicationContext;
@@ -33,6 +35,7 @@ import com.github.nkinsp.clover.query.DeleteWrapper;
 import com.github.nkinsp.clover.query.QueryWrapper;
 import com.github.nkinsp.clover.table.TableInfo;
 
+@Slf4j
 public class RepositoryFactoryBean implements FactoryBean<Object>,InvocationHandler,ApplicationContextAware {
 
 
@@ -50,7 +53,7 @@ public class RepositoryFactoryBean implements FactoryBean<Object>,InvocationHand
 	
 	private ApplicationContext applicationContext;
 	
-	private static ConcurrentHashMap<Integer, MethodHandle> methodHandleMap = new ConcurrentHashMap<Integer, MethodHandle>();
+	private static final ConcurrentHashMap<Integer, MethodHandle> methodHandleMap = new ConcurrentHashMap<Integer, MethodHandle>();
 	
 	@Override
 	public Object getObject() throws Exception {
@@ -104,7 +107,7 @@ public class RepositoryFactoryBean implements FactoryBean<Object>,InvocationHand
 				.map(type-> ((Class<?>) type))
 				.findAny()
 				;
-		if(!optional.isPresent()) {
+		if(optional.isEmpty()) {
 			throw new RuntimeException("no table entity mappping");
 		}
 		this.tableClass = (Class<?>) optional.get();
@@ -119,7 +122,7 @@ public class RepositoryFactoryBean implements FactoryBean<Object>,InvocationHand
 				List<ConditionAdapter<? extends Annotation>> adapters = DbContext.getConditionAdapters()
 						.stream()
 						.filter(s->s.annotationType().equals(annotation.annotationType()))
-						.collect(Collectors.toList());
+						.toList();
 				for (ConditionAdapter<? extends Annotation> adapter : adapters) {
 					if(!wrapper.getConditions().isEmpty()) {
 						wrapper.and();
@@ -190,20 +193,26 @@ public class RepositoryFactoryBean implements FactoryBean<Object>,InvocationHand
 		
 		for (Class<?> paramType : method.getParameterTypes()) {
 			methodKey.append(paramType.getName());
-			
 		}
-		
-		int key = methodKey.hashCode();
-		
 
+		int key = methodKey.toString().hashCode();
 		MethodHandle handle = methodHandleMap.computeIfAbsent(key, s -> {
 
 			try {
-				return MethodHandles.lookup().unreflectSpecial(method, method.getDeclaringClass()).bindTo(proxy);
-			} catch (IllegalAccessException e) {
+				Class<?> declaringClass = method.getDeclaringClass();
+
+				return MethodHandles.privateLookupIn(declaringClass,MethodHandles.lookup())
+						.findSpecial(
+								declaringClass,
+								method.getName(),
+								MethodType.methodType(method.getReturnType(), method.getParameterTypes()),
+								declaringClass
+								)
+						.bindTo(proxy);
+			} catch (IllegalAccessException | NoSuchMethodException e) {
 				throw new RuntimeException("get Method %s err=>%s".formatted(method.getName(),e.getMessage()));
 			}
-		});
+        });
 
 		return handle;
 

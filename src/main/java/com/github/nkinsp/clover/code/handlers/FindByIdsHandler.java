@@ -16,15 +16,14 @@ import com.github.nkinsp.clover.table.TableInfo;
 
 /**
  * 通过id查询 *
- * @param <R>
  */
 public class FindByIdsHandler<T,Id>  implements ExecuteHandler<Rows<T>> {
 
 	   
-   private Collection<Object> ids;
+   private final Collection<Object> ids;
 
 
-   private TableInfo<T> tableInfo;
+   private final TableInfo<T> tableInfo;
 	
    
 	public List<T> findRowsByIds(DbContext context, Object[] ids) {

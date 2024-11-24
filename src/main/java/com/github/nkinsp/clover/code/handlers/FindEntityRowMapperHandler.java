@@ -78,22 +78,7 @@ public class FindEntityRowMapperHandler<E, T> implements ExecuteHandler<Rows<E>>
 		if (CollectionUtils.isEmpty(results)) {
 			return Rows.of(results);
 		}
-	
-		EntityCascadeMapper mapper = entityClass.getAnnotation(EntityCascadeMapper.class);
-		if (mapper != null) {
-			EntityMapper entityMapper = EntityMapperManager.getEntityMapper(entityClass);
-			Map<JoinType, CascadeAdapter> cascadeAdapters = DbContext.getCascadeAdapters();
-			entityMapper.getEntityFieldInfos().stream().filter(EntityFieldInfo::isCascade)
-					.forEach(entityFieldInfo -> {
-						CascadeInfo cascadeInfo = entityFieldInfo.getCascadeInfo();
-						CascadeAdapter adapter = cascadeAdapters.get(cascadeInfo.getJoinType());
-						if (adapter != null) {
-							adapter.adapter(context,tableInfo,entityMapper,results, entityFieldInfo);
-						}
-					});
-
-		}
-		
+		context.executeCascadeAdapter(tableInfo,entityClass,results);
 		
 		return Rows.of(results);
 	}

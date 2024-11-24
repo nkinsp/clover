@@ -44,9 +44,7 @@ public class UpdateEntityHandler<T> extends UpdateHandler<T> {
 			}
 		}
 		
-		updateMap.forEach((name,value)->{
-			wrapper.set(name, value);
-		});
+		updateMap.forEach(wrapper::set);
 		
 		wrapper.where().eq(idField.getColumnName(), id);
 		// 执行数据库
