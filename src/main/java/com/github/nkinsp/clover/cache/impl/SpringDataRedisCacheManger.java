@@ -94,10 +94,7 @@ public class SpringDataRedisCacheManger implements CacheManager {
 
 	@Override
 	public <T> void multiSet(TableInfo<T> tableInfo, Map<Object, T> data) {
-	
-//		redisTemplate.opsForValue().m
-		
-//		redisTemplate.m
+
 		
 		Map<String, Object> cacheDataMap = new HashMap<>(data.size());
 		
@@ -114,21 +111,17 @@ public class SpringDataRedisCacheManger implements CacheManager {
 
 			@SuppressWarnings("rawtypes")
 			final RedisSerializer keySerializer = redisTemplate.getKeySerializer();
-			List<byte[]> keys = data.keySet().stream().map(k -> keySerializer.serialize(k))
-					.collect(Collectors.toList());
+			List<byte[]> keys = cacheDataMap.keySet().stream().map(k -> keySerializer.serialize(k))
+					.toList();
 			long seconds = TimeoutUtils.toSeconds(tableInfo.getCacheTime(), tableInfo.getCacheTimeUnit());
 
 			// 批量设置过期时间
-			redisTemplate.executePipelined(new RedisCallback<Object>() {
-
-				@Override
-				public Object doInRedis(RedisConnection connection) throws DataAccessException {
-					for (byte[] key : keys) {
-						connection.expire(key, seconds);
-					}
-					return null;
-				}
-			});
+			redisTemplate.executePipelined((RedisCallback<Object>) connection -> {
+                for (byte[] key : keys) {
+                    connection.expire(key, seconds);
+                }
+                return null;
+            });
 
 		}
 		
