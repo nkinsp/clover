@@ -45,35 +45,43 @@ public class UpdateEntityHandler<T> extends UpdateHandler<T> {
 		}
 		
 		updateMap.forEach(wrapper::set);
-		
 		wrapper.where().eq(idField.getColumnName(), id);
-		// 执行数据库
-		Integer result = super.handle(context);
-
-		if (!tableInfo.isCache()) {
-			return result;
-		}
 
 		CacheManager manager = context.getCacheManager();
-		if (manager == null) {
-			return result;
-		}
-		T data = manager.get(tableInfo, id);
-		if (data == null) {
-			return result;
+
+		//删除缓存
+		if (tableInfo.isCache() && manager != null) {
+
+			manager.delete(tableInfo,id);
+
 		}
 
-		for (Entry<String, Object> en : updateMap.entrySet()) {
+		// 执行数据库
+		return  super.handle(context);
 
-			EntityFieldInfo fieldInfo = tableInfo.getEntityMapper().get(en.getKey());
-			if (fieldInfo != null) {
-				fieldInfo.invokeSet(data, en.getValue());
-			}
-		}
+
+		//删除缓存
+
+
+
+
+
+//		T data = manager.get(tableInfo, id);
+//		if (data == null) {
+//			return result;
+//		}
+//
+//		for (Entry<String, Object> en : updateMap.entrySet()) {
+//
+//			EntityFieldInfo fieldInfo = tableInfo.getEntityMapper().get(en.getKey());
+//			if (fieldInfo != null) {
+//				fieldInfo.invokeSet(data, en.getValue());
+//			}
+//		}
+//
+//		manager.set(tableInfo, id, data);
 		
-		manager.set(tableInfo, id, data);
-		
-		return result;
+//		return result;
 
 	}
 
