@@ -19,4 +19,6 @@ public @interface Like {
 	boolean prefix() default true;
 	
 	boolean suffix() default true;
+
+	boolean ignoreCase() default  false;
 }

@@ -21,6 +21,11 @@ public class LikeConditionAdapter implements ConditionAdapter<Like>{
 		Like like = (Like) annotation;
 		
 		String column = ObjectUtils.isEmpty(like.value())?name:like.value();
+
+		if(like.ignoreCase()){
+			return x->x.excerpt("UPPER("+column+") LIKE UPPER(?)", (like.prefix()?"%":"")+value+(like.suffix()?"%":""));
+		}
+
 		return x->x.like(column, (like.prefix()?"%":"")+value+(like.suffix()?"%":""));
 	}
 
