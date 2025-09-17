@@ -16,4 +16,6 @@ public @interface Column {
 	String alias() default "";
 		
 	Class<?> convert() default DefaultConvert.class;
+	
+	boolean json() default false;
 }

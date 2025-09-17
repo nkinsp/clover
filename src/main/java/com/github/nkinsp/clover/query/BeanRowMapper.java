@@ -44,6 +44,24 @@ public class BeanRowMapper<T> implements RowMapper<T>{
 			}
 			
 			
+			//json 序列化
+			if(fieldInfo.isJson()) {
+				
+				try {
+					String value = (String) JdbcUtils.getResultSetValue(rs, index, String.class);
+					Object object = fieldInfo.deserializeObject(value);
+					fieldInfo.invokeSet(result, object);
+					
+				} catch (Exception e) {
+					// TODO: handle exception
+					log.error("Entity [{}] column {} set to propery {} error {}", entityClass.getName(),columnName, fieldInfo.getFieldName(), e.getMessage());
+					
+				}
+				continue;
+				
+			}
+			
+			
 			
 			
 			PropertyDescriptor pd = fieldInfo.getProperty();

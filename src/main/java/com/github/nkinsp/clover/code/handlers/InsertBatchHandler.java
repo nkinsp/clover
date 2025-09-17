@@ -48,7 +48,7 @@ public class InsertBatchHandler<En> implements ExecuteHandler<int[]>{
 						value = tableInfo.getKeyGenerator().createId(context, tableInfo);
 					}
 					if (value != null) {
-						entityData.put(column, value);
+						entityData.put(column, fieldInfo.serializeValue(value));
 					}
 				}
 			}

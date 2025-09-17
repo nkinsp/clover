@@ -13,7 +13,6 @@ import java.util.function.Consumer;
 import javax.sql.DataSource;
 
 import com.github.nkinsp.clover.annotation.EntityCascadeMapper;
-import com.github.nkinsp.clover.result.Rows;
 import com.github.nkinsp.clover.table.CascadeInfo;
 import org.springframework.jdbc.core.JdbcTemplate;
 

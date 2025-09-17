@@ -4,13 +4,15 @@ import java.beans.PropertyDescriptor;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.ParameterizedType;
+import java.lang.reflect.Type;
 import java.util.List;
 
 import org.springframework.beans.BeanUtils;
 
-import com.alibaba.fastjson.JSONObject;
+import com.alibaba.fastjson2.JSON;
 import com.github.nkinsp.clover.annotation.CascadeMapperColumn;
 import com.github.nkinsp.clover.annotation.Column;
+import com.github.nkinsp.clover.code.type.JsonType;
 import com.github.nkinsp.clover.enums.JoinType;
 import com.github.nkinsp.clover.util.StringUtils;
 
@@ -31,6 +33,8 @@ public class EntityFieldInfo {
 	
 	private boolean cascade = false;
 	
+	private boolean json = false;
+	
 	private CascadeInfo cascadeInfo;
 
 	
@@ -43,10 +47,29 @@ public class EntityFieldInfo {
 			info.setField(field);
 			String colunmName = StringUtils.camelToUnder(field.getName());
 			info.setColumnName(colunmName);
+			
+			
+			if(JsonType.class.isAssignableFrom(field.getType())) {
+				
+				info.setJson(true);
+				
+			}
+			
+			
 			Column column = field.getAnnotation(Column.class);
-			if (column != null && StringUtils.isEmpty(column.value())) {
-				info.setColumnName(column.value());
-				info.setAlias(column.alias());
+			if (column != null) {
+				
+				if(!StringUtils.isEmpty(column.value())) {
+					info.setColumnName(column.value());
+				}
+				
+				if(!StringUtils.isEmpty(column.alias())) {
+					info.setAlias(column.alias());
+				}
+				
+				info.setJson(column.json());
+				
+				
 			}
 			CascadeMapperColumn cascade = field.getAnnotation(CascadeMapperColumn.class);
 			if (cascade != null) {
@@ -105,9 +128,38 @@ public class EntityFieldInfo {
 		}
 	}
 
-
-
 	
+	public Object deserializeObject(String json) {
+		
+	
+		
+	
+		 if(List.class.isAssignableFrom(field.getType())) {
+			 
+			  Type type = field.getGenericType();
+			  
+			  if (type instanceof ParameterizedType pt) {
+				  Type[] types = pt.getActualTypeArguments();
+				  return JSON.parseArray(json, (Class<?>) types[0]);
+			  }
+			 
+			 return JSON.parseArray(json);
+			 
+		 }
+		 
+		 return JSON.parseObject(json, field.getType());
+		 	  
+	}
+
+
+	public Object serializeValue(Object value) {
+		
+		if(json) {
+			return JSON.toJSONString(value);
+		}
+		return value;
+		
+	}
  	
 	
 }

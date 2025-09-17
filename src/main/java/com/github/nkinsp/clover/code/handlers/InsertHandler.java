@@ -39,14 +39,16 @@ public class InsertHandler<R,T> implements ExecuteHandler<R>{
 	
 		EntityMapper mapper = EntityMapperManager.getEntityMapper(entity.getClass());
 		List<String> columns = mapper.getColumns();
+		
+		
 		Map<String, Object> entityData = new LinkedHashMap<String, Object>(columns.size());
 		
 		for (String column : columns) {
 			EntityFieldInfo fieldInfo = mapper.getByColumnName(column);
 			if(fieldInfo != null) {
 				Object value = fieldInfo.invokeGet(entity);
-				if(value != null) {	
-					entityData.put(column, value);
+				if(value != null) {
+					entityData.put(column, fieldInfo.serializeValue(value));					
 				}
 			}
 		}	

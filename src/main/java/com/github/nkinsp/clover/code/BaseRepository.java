@@ -121,6 +121,17 @@ public interface BaseRepository<Id, En> {
 		return dbContext().executeHandler(new UpdateHandler<En>(wrapper));
 	}
 	
+	/**
+	 * 更新数据
+	 * @param wrapper
+	 * @return
+	 */
+	default int updateBy(UpdateWrapper<En> wrapper) {
+		
+		return dbContext().executeHandler(new UpdateHandler<En>(wrapper));
+		
+	}
+	
 	
 	/**
 	 * 主键id 查询
@@ -308,6 +319,16 @@ public interface BaseRepository<Id, En> {
 		);
 	}
 	
+	default <R> Rows<R> findRowsOf(Class<R> resultType,QueryWrapper<En> wrapper) {
+
+		return dbContext().executeHandler(new FindEntityRowMapperHandler<>(resultType, wrapper));
+	}
+	
+	
+	default Rows<En> findRowsOf(QueryWrapper<En> wrapper) {
+
+		return dbContext().executeHandler(new FindEntityRowMapperHandler<>(wrapper.getTableClass(), wrapper));
+	}
 	
 	
 	
@@ -339,6 +360,8 @@ public interface BaseRepository<Id, En> {
 		
 		return new Page<>(countOf, rows);		
 	}
+	
+	
 	
 	/**
 	 * 条件 分页查询

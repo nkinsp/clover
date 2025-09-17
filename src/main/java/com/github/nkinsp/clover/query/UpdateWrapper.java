@@ -6,6 +6,7 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.stream.Collectors;
 
+import com.github.nkinsp.clover.code.DbContext;
 import com.github.nkinsp.clover.enums.SqlKeyword;
 import com.github.nkinsp.clover.table.TableInfo;
 
@@ -24,6 +25,12 @@ public class UpdateWrapper<T> extends AbstractWrapper<UpdateWrapper<T>>{
 		this.tableInfo = tableInfo;
 	}
 	
+	public UpdateWrapper(Class<T> tableClass) {
+		
+		this(DbContext.getTableInfo(tableClass));
+		
+		
+	}
 	
 	
 	public UpdateWrapper<T> set(String column,Object value) {

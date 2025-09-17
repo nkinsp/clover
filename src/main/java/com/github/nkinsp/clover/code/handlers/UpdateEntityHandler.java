@@ -3,7 +3,6 @@ package com.github.nkinsp.clover.code.handlers;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Map.Entry;
 
 import com.github.nkinsp.clover.cache.CacheManager;
 import com.github.nkinsp.clover.code.DbContext;
@@ -39,7 +38,7 @@ public class UpdateEntityHandler<T> extends UpdateHandler<T> {
 			if(!field.getFieldName().equals(idField.getFieldName())) {
 				Object value = field.invokeGet(entity);
 				if (value != null) {
-					updateMap.put(field.getColumnName(), value);
+					updateMap.put(field.getColumnName(), field.serializeValue(value));
 				}
 			}
 		}
