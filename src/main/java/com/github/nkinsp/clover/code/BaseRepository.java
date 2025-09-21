@@ -156,6 +156,12 @@ public interface BaseRepository<Id, En> {
 		return dbContext().executeHandler(new FindByQueryHandler<>(queryWrapper.getTableClass(), queryWrapper));
 
 	}
+	
+	default En findBy(QueryWrapper<En> queryWrapper) {
+ 
+		return dbContext().executeHandler(new FindByQueryHandler<>(queryWrapper.getTableClass(), queryWrapper));
+
+	}
 
 	/**
 	 * 条件查询
