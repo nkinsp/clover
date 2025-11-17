@@ -422,6 +422,17 @@ public interface BaseRepository<Id, En> {
 
 	}
 	
+	/**
+	 * 根据参数查询
+	 * 
+	 * @param entityQuery
+	 * @return
+	 */
+	default Long findCountOf(QueryWrapper<En> wrapper) {
+		wrapper.select(SqlKeyword.COUNT.format("1"));
+		return dbContext().executeHandler(new FindForObjectHandler<>(Long.class, wrapper));
+
+	}
 	
 	
 	

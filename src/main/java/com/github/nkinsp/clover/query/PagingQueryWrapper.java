@@ -5,6 +5,11 @@ import com.github.nkinsp.clover.code.DbDialectAdapter;
 import com.github.nkinsp.clover.enums.DbType;
 import com.github.nkinsp.clover.table.TableInfo;
 
+import lombok.Data;
+import lombok.EqualsAndHashCode;
+
+@EqualsAndHashCode(callSuper = true)
+@Data
 public class PagingQueryWrapper<T> extends QueryWrapper<T>{
 
 	private Integer pageNumber = 1;
@@ -28,6 +33,10 @@ public class PagingQueryWrapper<T> extends QueryWrapper<T>{
 		this.dbType = dbType;
 	}
 	
+	public PagingQueryWrapper(Class<T> tableClass) {
+		super(tableClass);
+	}
+	
 	
 	@Override
 	public String buildSql() {
@@ -36,5 +45,7 @@ public class PagingQueryWrapper<T> extends QueryWrapper<T>{
 		 return adapter.buildPaingSql(this, sql, pageNumber, pageSize);
 		 
 	}
+	
+	
 
 }
