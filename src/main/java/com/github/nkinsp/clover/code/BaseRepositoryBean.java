@@ -27,7 +27,7 @@ public abstract class BaseRepositoryBean<Id,En> implements BaseRepository<Id, En
 	
 	@SuppressWarnings("unchecked")
 	public BaseRepositoryBean() {
-		Class<?>tableClass = (Class<?>) (((ParameterizedType) this.getClass().getGenericSuperclass()).getActualTypeArguments()[0]);
+		Class<?>tableClass = (Class<?>) (((ParameterizedType) this.getClass().getGenericSuperclass()).getActualTypeArguments()[1]);
 		this.tableInfo = (TableInfo<En>) DbContext.getTableInfo(tableClass);
 		
 	}
