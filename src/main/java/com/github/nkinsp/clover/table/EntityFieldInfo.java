@@ -40,6 +40,10 @@ public class EntityFieldInfo {
 	
 	public static EntityFieldInfo create(Class<?> beanClass, Field field) {
 
+		if(field == null){
+			return null;
+		}
+
 		synchronized (beanClass) {
 
 			EntityFieldInfo info = new EntityFieldInfo();
