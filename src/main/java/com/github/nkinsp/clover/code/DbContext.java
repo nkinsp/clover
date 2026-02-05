@@ -18,8 +18,8 @@ import org.springframework.jdbc.core.JdbcTemplate;
 
 import com.github.nkinsp.clover.cache.CacheManager;
 import com.github.nkinsp.clover.code.cascade.CascadeAdapter;
-import com.github.nkinsp.clover.code.cascade.OneToManyCascadeAdapter;
-import com.github.nkinsp.clover.code.cascade.OneToOneCascadeAdapter;
+import com.github.nkinsp.clover.code.cascade.ManyCascadeAdapter;
+import com.github.nkinsp.clover.code.cascade.OneCascadeAdapter;
 import com.github.nkinsp.clover.code.dialect.MysqlDbDialectAdapter;
 import com.github.nkinsp.clover.code.handlers.ExecuteHandler;
 import com.github.nkinsp.clover.enums.DbType;
@@ -182,17 +182,14 @@ public class DbContext extends JdbcTemplate{
 		return null;
 	}
 
-	
-	
-	
-	
+
 	/**
 	 * 添加实体参数
-	 * @param <T>
 	 * @param wrapper
 	 * @param query
+	 * @param <T>
 	 */
-	public <T> void appendWrapperParmas(QueryWrapper<T> wrapper,EntityQuery<T> query) {
+	public <T> void appendWrapperParams(QueryWrapper<T> wrapper, EntityQuery<T> query) {
 		
 		List<ConditionAdapter<?>> adapters = getConditionAdapters();
 
@@ -205,22 +202,20 @@ public class DbContext extends JdbcTemplate{
 			Field field = fieldInfo.getField();
 			String fieldName = fieldInfo.getFieldName();
 			Object value = fieldInfo.invokeGet(query);
-
-			if (!ObjectUtils.isEmpty(value)) {
-
-				for (ConditionAdapter<?> adapter : adapters) {
-
-					Annotation annotation = field.getAnnotation(adapter.annotationType());
-					if (annotation != null) {
-
-						Consumer<Condition<?>> consumer = adapter.adapter(annotation, fieldName, value);
-						if (!wrapper.getConditions().isEmpty()) {
-							wrapper.and();
-						}
-						consumer.accept(wrapper);
+			if (ObjectUtils.isEmpty(value)) {
+				continue;
+			}
+			for (ConditionAdapter<?> adapter : adapters) {
+				Annotation annotation = field.getAnnotation(adapter.annotationType());
+				if (annotation != null) {
+					Consumer<Condition<?>> consumer = adapter.adapter(annotation, fieldName, value);
+					if (!wrapper.getConditions().isEmpty()) {
+						wrapper.and();
 					}
+					consumer.accept(wrapper);
 				}
 			}
+
 		}
 		
 		//
@@ -322,8 +317,8 @@ public class DbContext extends JdbcTemplate{
 	}
 	
 	private static void initCascadeAdapter() {
-		addCascadeAdapter(new OneToOneCascadeAdapter());
-		addCascadeAdapter(new OneToManyCascadeAdapter());
+		addCascadeAdapter(new OneCascadeAdapter());
+		addCascadeAdapter(new ManyCascadeAdapter());
 	}
 
 	public static void addConditionAdapter(ConditionAdapter<? extends Annotation> adapter) {

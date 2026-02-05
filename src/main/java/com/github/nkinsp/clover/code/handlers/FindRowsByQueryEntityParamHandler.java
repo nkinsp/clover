@@ -35,7 +35,7 @@ public class FindRowsByQueryEntityParamHandler<T,E> implements ExecuteHandler<Ro
 
 		QueryWrapper<T> wrapper = createQueryWrapper();
 		
-		context.appendWrapperParmas(wrapper,this.query);
+		context.appendWrapperParams(wrapper,this.query);
 		
 		if(!StringUtils.isEmpty(query.orderBy())){
 			wrapper.orderBy(query.orderBy());

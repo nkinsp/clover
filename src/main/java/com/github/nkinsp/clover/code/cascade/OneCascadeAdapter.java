@@ -20,7 +20,7 @@ import com.github.nkinsp.clover.table.TableInfo;
 import com.github.nkinsp.clover.util.ObjectUtils;
 
 @Slf4j
-public class OneToOneCascadeAdapter implements CascadeAdapter{
+public class OneCascadeAdapter implements CascadeAdapter{
 
 	
 	@Override

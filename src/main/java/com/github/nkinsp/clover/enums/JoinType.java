@@ -4,5 +4,6 @@ public enum JoinType {
 
 	ONE,
 	MANY,
+	@Deprecated
 	ONE_TO_MANY
 }

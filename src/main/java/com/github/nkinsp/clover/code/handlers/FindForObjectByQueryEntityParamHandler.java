@@ -1,7 +1,6 @@
 package com.github.nkinsp.clover.code.handlers;
 
 import com.github.nkinsp.clover.code.DbContext;
-import com.github.nkinsp.clover.enums.SqlKeyword;
 import com.github.nkinsp.clover.query.EntityQuery;
 import com.github.nkinsp.clover.query.QueryWrapper;
 
@@ -22,7 +21,7 @@ public class FindForObjectByQueryEntityParamHandler<R,T> implements ExecuteHandl
 	public R handle(DbContext context) {
 		
 		
-		context.appendWrapperParmas(queryWrapper, entityQuery);
+		context.appendWrapperParams(queryWrapper, entityQuery);
 		
 		queryWrapper.setSelectColumns(column);
 		
